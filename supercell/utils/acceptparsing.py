@@ -71,5 +71,5 @@ def parse_accept_header(accept):
             else:
                 media_params.append((key, value))
         result.append((media_type, dict(media_params), q))
-    result.sort(lambda x, y: -cmp(x[2], y[2]))
+    result.sort(cmp=lambda x, y: -cmp(x[2], y[2]))
     return result
