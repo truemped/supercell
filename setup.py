@@ -15,19 +15,27 @@
 # limitations under the License.
 #
 #
-import os
 from imp import load_source
+import os
 from setuptools import setup, find_packages
+import sys
 
 
 init = load_source('init', os.path.join('supercell', '__init__.py'))
+PY2 = sys.version_info[0] == 2
 
 
 tests_require = [
-    'coverage',
     'tornado-pyvows>=0.5.0',
     'mock==1.0.1',
     ]
+
+
+extras_require = {}
+extras_require['test'] = tests_require
+extras_require['futures'] = ''
+if PY2:
+    extras_require['futures'] = 'futures == 2.1.3'
 
 
 setup (
@@ -45,8 +53,5 @@ setup (
         'tornado >= 3.1.0',
     ],
     tests_require = tests_require,
-    extras_require = {
-        'test': tests_require,
-        'futures': ['futures == 2.1.3'],
-    }
+    extras_require = extras_require
 )
