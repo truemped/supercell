@@ -27,6 +27,8 @@ from collections import defaultdict
 from tornado import gen
 from tornado.web import asynchronous
 
+from supercell._compat import iteritems
+
 
 def get(fn):
     '''Decorator for HTTP GET methods.
@@ -151,7 +153,7 @@ def provides(content_type, vendor_info=None):
         if not hasattr(cls, '_METHODS'):
             cls._METHODS = defaultdict(list)
 
-        for name, method in cls.__dict__.iteritems():
+        for name, method in iteritems(cls.__dict__):
             if hasattr(method, 'http_verb') and method.http_verb in ['get']:
                 # only the GET method will create representations of something,
                 # now add this method to cls._METHODS
