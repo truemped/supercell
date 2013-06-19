@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 #
-from collections import defaultdict
-
 from tornado.web import RequestHandler as rq
 
 
