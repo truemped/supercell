@@ -15,9 +15,12 @@
 # limitations under the License.
 #
 #
+from supercell.api.decorators import provides, consumes
 from supercell.api.requesthandler import RequestHandler
 
 
 __all__ = [
-        'RequestHandler'
+        'RequestHandler',
+        'provides',
+        'consumes'
     ]

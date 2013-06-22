@@ -15,138 +15,133 @@
 # limitations under the License.
 #
 #
-from collections import defaultdict
-
 from unittest import TestCase
 from nose.tools import raises
 
-from supercell.api import RequestHandler
-from supercell.api.decorators import (get, put, post, delete, head, provides,
-                                      consumes)
-
-
-class TestSimpleHeader(TestCase):
-    '''Test the simple HTTP verb decorators.'''
-
-    def test_get_decorator(self):
-
-        @get
-        def sample_method():
-            pass
-
-        self.assertTrue(hasattr(sample_method, 'http_verb'))
-        self.assertEqual(sample_method.http_verb, 'get')
-
-    def test_put_decorator(self):
-
-        @put
-        def sample_method():
-            pass
-
-        self.assertTrue(hasattr(sample_method, 'http_verb'))
-        self.assertEqual(sample_method.http_verb, 'put')
-
-    def test_post_decorator(self):
-
-        @post
-        def sample_method():
-            pass
-
-        self.assertTrue(hasattr(sample_method, 'http_verb'))
-        self.assertEqual(sample_method.http_verb, 'post')
-
-    def test_delete_decorator(self):
-
-        @delete
-        def sample_method():
-            pass
-
-        self.assertTrue(hasattr(sample_method, 'http_verb'))
-        self.assertEqual(sample_method.http_verb, 'delete')
-
-    def test_head_decorator(self):
-
-        @head
-        def sample_method():
-            pass
-
-        self.assertTrue(hasattr(sample_method, 'http_verb'))
-        self.assertEqual(sample_method.http_verb, 'head')
+from supercell.api import (RequestHandler, provides, consumes)
 
 
 class TestConsumesDecorator(TestCase):
     '''Test the consumes decorator.'''
 
-    def test_consumes_decorator(self):
+    @raises(AssertionError)
+    def test_on_non_class(self):
 
         @consumes('application/json')
-        def sample_method():
+        def get():
             pass
 
-        self.assertTrue(hasattr(sample_method, 'consumes_content_type'))
-        self.assertEqual(sample_method.consumes_content_type,
-                         ('application/json', None))
+    def test_simple_consumes_decorator_with_post(self):
+
+        @consumes('application/json')
+        class MyHandler(RequestHandler):
+
+            _CONS_CONTENT_TYPES = {}
+
+            def post(self):
+                pass
+
+        self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertIsNone(content_type.vendor)
+        self.assertIsNone(content_type.version)
+        self.assertIsNone(content_type.model)
 
     def test_consumes_decorator_with_vendor_info(self):
 
-        @consumes('application/json', 'vnd.ficture.light-v1.0')
-        def sample_method():
-            pass
+        @consumes('application/json', 'vnd.ficture.light', version='v1.0')
+        class MyHandler(RequestHandler):
 
-        self.assertTrue(hasattr(sample_method, 'consumes_content_type'))
-        self.assertEqual(sample_method.consumes_content_type,
-                         ('application/json', 'vnd.ficture.light-v1.0'))
+            def post(self):
+                pass
+
+        self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertEqual(content_type.vendor, 'vnd.ficture.light')
+        self.assertEqual(content_type.version, 'v1.0')
+        self.assertIsNone(content_type.model)
+
+    def test_consumes_decorator_with_model(self):
+
+        @consumes('application/json', model=object)
+        class MyHandler(RequestHandler):
+
+            def post(self):
+                pass
+
+        self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertIsNone(content_type.vendor)
+        self.assertIsNone(content_type.version)
+        self.assertEqual(content_type.model, object)
 
 
 class TestProvidesDecorator(TestCase):
-    '''Test the provides class decorator.'''
+    '''Test the consumes decorator.'''
 
     @raises(AssertionError)
-    def test_provides_decorator_on_non_class(self):
+    def test_on_non_class(self):
 
         @provides('application/json')
-        def sample_method():
+        def get():
             pass
 
-    def test_provides_without_http_methods(self):
+    def test_simple_provides_decorator_with_post(self):
 
         @provides('application/json')
-        class SampleHandler(RequestHandler):
+        class MyHandler(RequestHandler):
+            _PROD_CONTENT_TYPES = {}
+
             pass
 
-        self.assertEqual(len(SampleHandler._METHODS), 0)
+        self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertIsNone(content_type.vendor)
+        self.assertIsNone(content_type.version)
+        self.assertIsNone(content_type.model)
 
-    def test_provides_with_get_method(self):
+    def test_provides_decorator_with_vendor_info(self):
 
-        @provides('application/json')
-        class SampleHandler(RequestHandler):
+        @provides('application/json', 'vnd.ficture.light', version='v1.0')
+        class MyHandler(RequestHandler):
 
-            _METHODS = defaultdict(list)
-
-            @get
-            def sample_method(self):
+            def update_stuff(self):
                 pass
 
-        self.assertEqual(len(SampleHandler._METHODS), 1)
-        method_details = SampleHandler._METHODS['get'][0]
-        self.assertEqual(method_details[0], 'application/json')
-        self.assertEqual(method_details[1], None)
-        self.assertTrue(callable(method_details[2]))
+        self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertEqual(content_type.vendor, 'vnd.ficture.light')
+        self.assertEqual(content_type.version, 'v1.0')
+        self.assertIsNone(content_type.model)
 
-    def test_provides_with_vendor(self):
+    def test_provides_decorator_with_model(self):
 
-        @provides('application/json', vendor_info='vnd.ficture-v1.3')
-        class SampleHandler(RequestHandler):
+        @provides('application/json', model=object)
+        class MyHandler(RequestHandler):
 
-            @get
-            def sample_method(self):
+            def update_stuff(self):
                 pass
 
-            def test(self):
-                pass
-
-        self.assertEqual(len(SampleHandler._METHODS), 1)
-        method_details = SampleHandler._METHODS['get'][0]
-        self.assertEqual(method_details[0], 'application/json')
-        self.assertEqual(method_details[1], 'vnd.ficture-v1.3')
-        self.assertTrue(callable(method_details[2]))
+        self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
+        self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
+        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertIsNone(content_type.vendor)
+        self.assertIsNone(content_type.version)
+        self.assertEqual(content_type.model, object)

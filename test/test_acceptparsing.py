@@ -22,6 +22,11 @@ class TestParseAcceptHeader(TestCase):
                                         'vendor': 'vnd.ficture.lightt'}, 1.0)]
         self.assertEquals(parse_accept_header(accept), should)
 
+    def test_parse_accept_header_smart_client_without_version(self):
+        accept = "application/vnd.ficture.lightt+json"
+        should = [('application/json', {'vendor': 'vnd.ficture.lightt'}, 1.0)]
+        self.assertEquals(parse_accept_header(accept), should)
+
     def test_parse_accept_header_dumbish_client(self):
         accept = "application/vnd.ficture.lightt-v1.0"
         should = [('application/vnd.ficture.lightt-v1.0', {}, 1.0)]

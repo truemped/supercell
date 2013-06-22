@@ -15,3 +15,7 @@
 # limitations under the License.
 #
 #
+from supercell.utils.acceptparsing import parse_accept_header
+
+
+__all__ = ['parse_accept_header']
