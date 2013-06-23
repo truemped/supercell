@@ -30,9 +30,13 @@ tests_require = [
     'mock==1.0.1',
     ]
 
+if sys.version_info < (2, 7):
+    tests_require.append('unittest2')
+
 
 extras_require = {}
 extras_require['test'] = tests_require
+extras_require['coverage'] = 'coverage == 3.6'
 extras_require['futures'] = ''
 if PY2:
     extras_require['futures'] = 'futures == 2.1.3'
@@ -51,6 +55,8 @@ setup (
 
     install_requires = [
         'tornado >= 3.1.0',
+        'schematics == 0.6.0',
+        'scales == 1.0.3',
     ],
     tests_require = tests_require,
     extras_require = extras_require
