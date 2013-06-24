@@ -16,15 +16,14 @@
 #
 #
 from __future__ import absolute_import, division, print_function, with_statement
-
-from supercell.api.metatypes import ContentType
-from supercell.api.requesthandler import RequestHandler
-from supercell.api.decorators import provides, consumes
+from collections import namedtuple
+from types import FloatType
 
 
-__all__ = [
-        'ContentType',
-        'RequestHandler',
-        'provides',
-        'consumes'
-    ]
+ContentTypeT = namedtuple('ContentType', ['content_type', 'vendor',
+                                         'version', 'model'])
+
+def ContentType(content_type, vendor=None, version=None, model=None):
+    if version:
+        assert isinstance(version, FloatType), 'Version must be a float'
+    return ContentTypeT(content_type, vendor, version, model)
