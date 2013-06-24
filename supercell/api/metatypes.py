@@ -17,7 +17,6 @@
 #
 from __future__ import absolute_import, division, print_function, with_statement
 from collections import namedtuple
-from types import FloatType
 
 
 ContentTypeT = namedtuple('ContentType', ['content_type', 'vendor',
@@ -25,5 +24,5 @@ ContentTypeT = namedtuple('ContentType', ['content_type', 'vendor',
 
 def ContentType(content_type, vendor=None, version=None, model=None):
     if version:
-        assert isinstance(version, FloatType), 'Version must be a float'
+        assert isinstance(version, float), 'Version must be a float'
     return ContentTypeT(content_type, vendor, version, model)
