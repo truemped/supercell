@@ -20,7 +20,7 @@ from __future__ import absolute_import, division, print_function, with_statement
 from tornado.web import RequestHandler as rq, HTTPError
 
 from supercell.utils import parse_accept_header
-from supercell._compat import ifilter, iteritems
+from supercell._compat import ifilter
 
 
 __all__ = ['RequestHandler']

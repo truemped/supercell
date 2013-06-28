@@ -15,6 +15,10 @@
 # limitations under the License.
 #
 #
+from __future__ import absolute_import, division, print_function, with_statement
+
+from collections import defaultdict
+
 import sys
 if sys.version_info > (2, 7):
     from unittest import TestCase
@@ -41,7 +45,7 @@ class TestConsumesDecorator(TestCase):
         @consumes('application/json')
         class MyHandler(RequestHandler):
 
-            _CONS_CONTENT_TYPES = {}
+            _CONS_CONTENT_TYPES = defaultdict(list)
 
             def post(self):
                 pass
@@ -49,7 +53,7 @@ class TestConsumesDecorator(TestCase):
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
@@ -57,7 +61,7 @@ class TestConsumesDecorator(TestCase):
 
     def test_consumes_decorator_with_vendor_info(self):
 
-        @consumes('application/json', 'vnd.ficture.light', version='v1.0')
+        @consumes('application/json', 'ficture.light', version=1.0)
         class MyHandler(RequestHandler):
 
             def post(self):
@@ -66,10 +70,10 @@ class TestConsumesDecorator(TestCase):
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
-        self.assertEqual(content_type.vendor, 'vnd.ficture.light')
-        self.assertEqual(content_type.version, 'v1.0')
+        self.assertEqual(content_type.vendor, 'ficture.light')
+        self.assertEqual(content_type.version, 1.0)
         self.assertIsNone(content_type.model)
 
     def test_consumes_decorator_with_model(self):
@@ -83,7 +87,7 @@ class TestConsumesDecorator(TestCase):
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json']
+        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
@@ -104,14 +108,14 @@ class TestProvidesDecorator(TestCase):
 
         @provides('application/json')
         class MyHandler(RequestHandler):
-            _PROD_CONTENT_TYPES = {}
+            _PROD_CONTENT_TYPES = defaultdict(list)
 
             pass
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
@@ -119,7 +123,7 @@ class TestProvidesDecorator(TestCase):
 
     def test_provides_decorator_with_vendor_info(self):
 
-        @provides('application/json', 'vnd.ficture.light', version='v1.0')
+        @provides('application/json', 'ficture.light', version=1.0)
         class MyHandler(RequestHandler):
 
             def update_stuff(self):
@@ -128,10 +132,10 @@ class TestProvidesDecorator(TestCase):
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
-        self.assertEqual(content_type.vendor, 'vnd.ficture.light')
-        self.assertEqual(content_type.version, 'v1.0')
+        self.assertEqual(content_type.vendor, 'ficture.light')
+        self.assertEqual(content_type.version, 1.0)
         self.assertIsNone(content_type.model)
 
     def test_provides_decorator_with_model(self):
@@ -145,7 +149,7 @@ class TestProvidesDecorator(TestCase):
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
         self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json']
+        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)

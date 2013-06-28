@@ -57,7 +57,7 @@ def parse_accept_header(accept):
                         except ValueError:
                             version = 1.0 # could not be parsed
                 # add the vendor code as a media param
-                media_params.append(('vendor', vnd))
+                media_params.append(('vendor', vnd.replace('vnd.', '')))
                 # and re-write media_type to something like application/json so
                 # it can be used usefully when looking up emitters
                 media_type = '/'.join([typ, extra])

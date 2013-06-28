@@ -23,8 +23,9 @@ if sys.version_info > (2, 7):
 else:
     from unittest2 import TestCase
 
+from supercell.api import provides, RequestHandler
 from supercell.api.metatypes import ContentType
-from supercell.api.provider import ProviderBase, JsonProvider
+from supercell.api.provider import ProviderBase, JsonProvider, NoProviderFound
 
 
 class MoreDetailedJsonProvider(JsonProvider):
@@ -41,14 +42,36 @@ class JsonProviderWithVendorAndVersion(JsonProvider):
 class TestBasicProvider(TestCase):
 
     def test_default_json_provider(self):
-        provider = ProviderBase.map_provider('application/json')
+
+        @provides('application/json')
+        class MyHandler(RequestHandler):
+            pass
+
+        provider = ProviderBase.map_provider('application/json',
+                                             handler=MyHandler)
         self.assertIs(provider, JsonProvider)
 
+        with self.assertRaises(NoProviderFound):
+            ProviderBase.map_provider('application/vnd.supercell-v1.1+json',
+                                      handler=MyHandler)
+
     def test_specific_json_provider(self):
-        provider = ProviderBase.map_provider('application/vnd.supercell+json')
+
+        @provides('application/json', vendor='supercell')
+        class MyHandler(RequestHandler):
+            pass
+
+        provider = ProviderBase.map_provider('application/vnd.supercell+json',
+                                             handler=MyHandler)
         self.assertIs(provider, MoreDetailedJsonProvider)
 
     def test_json_provider_with_version(self):
+
+        @provides('application/json', vendor='supercell', version=1.0)
+        class MyHandler(RequestHandler):
+            pass
+
         provider = ProviderBase.map_provider(
-                'application/vnd.supercell-v1.0+json')
+                'application/vnd.supercell-v1.0+json',
+                handler=MyHandler)
         self.assertIs(provider, JsonProviderWithVendorAndVersion)

@@ -22,14 +22,17 @@ The decorators for mapping HTTP verbs to instance methods automatically add the
 `tornado.web.asynchronous` and `tornado.gen.coroutine` decorators to the method,
 so you don't have to.
 '''
-from collections import namedtuple
+from __future__ import absolute_import, division, print_function, with_statement
+
+from collections import defaultdict
+from functools import wraps
 
 from tornado import gen
 from tornado.web import asynchronous
 
-
-ContentType = namedtuple('ContentType', ['content_type', 'vendor',
-                                         'version', 'model'])
+from supercell.api import ContentType, RequestHandler
+from supercell._compat import ifilter
+from supercell.utils import parse_accept_header
 
 
 def async(fn):
@@ -75,12 +78,12 @@ def provides(content_type, vendor=None, version=None, model=None):
                 'class decorator'
 
         if not hasattr(cls, '_PROD_CONTENT_TYPES'):
-            cls._PROD_CONTENT_TYPES = dict()
+            cls._PROD_CONTENT_TYPES = defaultdict(list)
 
-        cls._PROD_CONTENT_TYPES[content_type] = ContentType(content_type,
-                                                            vendor,
-                                                            version,
-                                                            model)
+        cls._PROD_CONTENT_TYPES[content_type].append(ContentType(content_type,
+                                                                 vendor,
+                                                                 version,
+                                                                 model))
         return cls
 
     return wrapper
@@ -105,11 +108,11 @@ def consumes(content_type, vendor=None, version=None, model=None):
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
                 'class decorator'
         if not hasattr(cls, '_CONS_CONTENT_TYPES'):
-            cls._CONS_CONTENT_TYPES = dict()
+            cls._CONS_CONTENT_TYPES = defaultdict(list)
 
-        cls._CONS_CONTENT_TYPES[content_type] = ContentType(content_type,
-                                                            vendor,
-                                                            version,
-                                                            model)
+        cls._CONS_CONTENT_TYPES[content_type].append(ContentType(content_type,
+                                                                 vendor,
+                                                                 version,
+                                                                 model))
         return cls
     return wrapper
