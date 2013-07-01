@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function, with_statement
 from collections import defaultdict
 import json
 
-from supercell._compat import with_metaclass, ifilter
+from supercell._compat import with_metaclass
 from supercell.api import ContentType
 from supercell.utils import parse_accept_header
 
@@ -50,14 +50,19 @@ class ProviderMeta(type):
     def __new__(cls, name, bases, dct):
         provider_class = type.__new__(cls, name, bases, dct)
 
-        ct = provider_class.CONTENT_TYPE
-        if ct:
+        if name != 'ProviderBase' and hasattr(provider_class, 'CONTENT_TYPE'):
+            ct = provider_class.CONTENT_TYPE
             ProviderMeta.KNOWN_CONTENT_TYPES[ct.content_type].append(
                     (ct, provider_class))
-            if name == 'ProviderBase':
-                provider_class.map_provider = ProviderMeta.map_provider
 
         return provider_class
+
+
+class ProviderBase(with_metaclass(ProviderMeta, object)):
+    '''Base class for content type providers.'''
+
+    CONTENT_TYPE = None
+    '''The target content type for the provider.'''
 
     @staticmethod
     def map_provider(accept_header, handler):
@@ -65,17 +70,12 @@ class ProviderMeta(type):
 
         If no provider matches, raise a `NoProviderFound` exception.
 
-        .. note::
-
-            TODO this algorithm can certainly be simplified via sorting and
-            searching...
-
         :param accept_header: HTTP Accept header value
         :type accept_header: str
         :param handler: supercell request handler
         '''
         accept = parse_accept_header(accept_header)
-        if len(accept_header) == 0:
+        if len(accept) == 0:
             raise NoProviderFound()
 
         for (ctype, params, q) in accept:
@@ -95,14 +95,7 @@ class ProviderMeta(type):
 
         raise NoProviderFound()
 
-
-class ProviderBase(with_metaclass(ProviderMeta, object)):
-    '''Base class for content type providers.'''
-
-    CONTENT_TYPE = None
-    '''The target content type for the provider.'''
-
-    def provide(self, model):
+    def provide(self, model, handler):
         '''This method should return the correct representation as a simple
         string (i.e. byte buffer) that will be used as return value.
 
@@ -117,7 +110,7 @@ class JsonProvider(ProviderBase):
 
     CONTENT_TYPE = ContentType('application/json', None, None)
 
-    def provide(self, model):
+    def provide(self, model, handler):
         '''Simply return the json via `json.dumps`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
