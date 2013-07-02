@@ -69,9 +69,19 @@ class TestBasicProvider(TestCase):
 
         @provides('application/json', vendor='supercell', version=1.0)
         class MyHandler(RequestHandler):
-            pass
+
+            def __init__(self, *args, **kwargs):
+                # do not call super here in order to test mapping on instances
+                # of this class
+                pass
 
         provider = ProviderBase.map_provider(
                 'application/vnd.supercell-v1.0+json',
                 handler=MyHandler)
+        self.assertIs(provider, JsonProviderWithVendorAndVersion)
+
+        handler = MyHandler()
+        provider = ProviderBase.map_provider(
+                'application/vnd.supercell-v1.0+json',
+                handler=handler)
         self.assertIs(provider, JsonProviderWithVendorAndVersion)

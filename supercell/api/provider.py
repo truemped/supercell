@@ -65,7 +65,7 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
     '''The target content type for the provider.'''
 
     @staticmethod
-    def map_provider(accept_header, handler):
+    def map_provider(accept_header, handler, allow_default=False):
         '''Map a given content type to the correct provider implementation.
 
         If no provider matches, raise a `NoProviderFound` exception.
@@ -74,24 +74,37 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
         :type accept_header: str
         :param handler: supercell request handler
         '''
-        accept = parse_accept_header(accept_header)
-        if len(accept) == 0:
+        if not hasattr(handler, '_PROD_CONTENT_TYPES'):
             raise NoProviderFound()
 
-        for (ctype, params, q) in accept:
-            if ctype not in handler._PROD_CONTENT_TYPES:
-                raise NoProviderFound()
+        accept = parse_accept_header(accept_header)
 
-            c = ContentType(ctype, vendor=params.get('vendor', None),
-                            version=params.get('version', None))
-            if c not in handler._PROD_CONTENT_TYPES[ctype]:
-                raise NoProviderFound()
+        if len(accept) > 0:
+            for (ctype, params, q) in accept:
+                if ctype not in handler._PROD_CONTENT_TYPES:
+                    continue
 
-            known_types = [t for t in ProviderMeta.KNOWN_CONTENT_TYPES[ctype]
-                           if t[0] == c]
+                c = ContentType(ctype, vendor=params.get('vendor', None),
+                                version=params.get('version', None))
+                if c not in handler._PROD_CONTENT_TYPES[ctype]:
+                    continue
 
-            if len(known_types) == 1:
-                return known_types[0][1]
+                known_types = [t for t in
+                               ProviderMeta.KNOWN_CONTENT_TYPES[ctype]
+                               if t[0] == c]
+
+                if len(known_types) == 1:
+                    return known_types[0][1]
+
+        if 'default' in handler._PROD_CONTENT_TYPES:
+            content_type = handler._PROD_CONTENT_TYPES['default']
+            ctype = content_type.content_type
+            default_type = [t for t in
+                            ProviderMeta.KNOWN_CONTENT_TYPES[ctype]
+                            if t[0] == content_type]
+
+            if len(default_type) == 1:
+                return default_type[0][1]
 
         raise NoProviderFound()
 
@@ -108,11 +121,12 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
 class JsonProvider(ProviderBase):
     '''Default `application/json` provider.'''
 
-    CONTENT_TYPE = ContentType('application/json', None, None)
+    CONTENT_TYPE = ContentType('application/json')
 
     def provide(self, model, handler):
         '''Simply return the json via `json.dumps`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         '''
-        return json.dumps(model.serialize())
+        handler.set_header('Content-Type', 'application/json')
+        handler.write(json.dumps(model.validate()))

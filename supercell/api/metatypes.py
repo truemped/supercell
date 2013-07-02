@@ -18,11 +18,53 @@
 from __future__ import absolute_import, division, print_function, with_statement
 from collections import namedtuple
 
+from tornado import gen
+
 
 ContentTypeT = namedtuple('ContentType', ['content_type', 'vendor',
-                                         'version', 'model'])
+                                         'version'])
 
-def ContentType(content_type, vendor=None, version=None, model=None):
+
+def ContentType(content_type, vendor=None, version=None):
     if version:
         assert isinstance(version, float), 'Version must be a float'
-    return ContentTypeT(content_type, vendor, version, model)
+    return ContentTypeT(content_type, vendor, version)
+
+
+ReturnInformationT = namedtuple('ReturnInformation', ['code', 'message'])
+
+
+def ReturnInformation(code, message=None):
+    return ReturnInformationT(code, message=message)
+
+
+class Return(gen.Return):
+    pass
+
+
+class Ok(Return):
+
+    def __init__(self, code=200, additional=None):
+        v = {'ok': True}
+        if additional:
+            assert isinstance(additional, dict), 'Additional messages must be of type dict'
+            v.update(additional)
+
+        super(Ok, self).__init__(ReturnInformation(code, message=v))
+
+
+class OkCreated(Ok):
+
+    def __init__(self, additional=None):
+        super(OkCreated, self).__init__(201, additional=additional)
+
+
+class Error(Return):
+
+    def __init__(self, code=400, additional=None):
+        v = {'error': True}
+        if additional:
+            assert isinstance(additional, dict), 'Additional messages must be of type dict'
+            v.update(additional)
+
+        super(Error, self).__init__(ReturnInformation(code, message=v))

@@ -16,11 +16,16 @@
 #
 #
 from __future__ import absolute_import, division, print_function, with_statement
+from functools import partial
+import json
 
+from tornado import gen
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.utils import parse_accept_header
-from supercell._compat import ifilter
+from supercell.api import Ok, Error, Return
+from supercell.api.metatypes import ReturnInformationT
+from supercell.api.consumer import ConsumerBase, NoConsumerFound
+from supercell.api.provider import ProviderBase, NoProviderFound
 
 
 __all__ = ['RequestHandler']
@@ -39,13 +44,6 @@ class RequestHandler(rq):
         verbs.'''
         super(RequestHandler, self).__init__(*args, **kwargs)
 
-    def initialize(self, conf, env):
-        '''
-        Each request handler as access to the configuration and environment
-        '''
-        self._conf = conf
-        self._env = env
-
     def _execute_method(self):
         '''
         Execute the request.
@@ -54,62 +52,46 @@ class RequestHandler(rq):
         '''
         if not self._finished:
             verb = self.request.method.lower()
+            headers = self.request.headers
             method = getattr(self, verb)
-            self._when_complete(method(*self.path_args, **self.path_kwargs),
-                                self._execute_function)
+            kwargs = self.path_kwargs
 
-    def _content_type_negotiation(self):
-        '''Negotiate the content types.'''
-        if verb in ['get', 'head'] and 'Accept' in self.request.headers:
-            # do the accept header parsing for GET requests only
-            accepts = parse_accept_header(self.request.headers['Accept'])
-            self._check_simple_content_type(accepts, verb)
-
-        elif verb in ['post', 'put'] and 'Content-Type' in self.request.headers:
-            ctype_header = self.request.headers['Content-Type']
-            content_type = parse_accept_header(ctype_header)
-            self._check_simple_content_type(content_type, verb)
-
-        return method
-
-    def _check_simple_content_type(self, content_types, verb):
-
-        if len(content_types) > 0:
-            for (ctype, p, q) in content_types:
-                methods = list(ifilter(lambda k: k.content_type == ctype,
-                                        self._METHODS[verb]))
-
-                l = len(methods)
-                if l == 0:
-                    # TODO return allowed content types
+            if verb in ['post', 'put'] and 'Content-Type' in headers:
+                # try to find a matching consumer
+                try:
+                    (model, consumer_class) = ConsumerBase.map_consumer(
+                            headers['Content-Type'], self)
+                    consumer = consumer_class()
+                    kwargs['model'] = consumer.consume(self, model)
+                except NoConsumerFound:
+                    # TODO return available consumer types?!
                     raise HTTPError(406)
-                elif l == 1:
-                    method = methods[0]
-                elif 'vendor' in p:
-                    method = self._check_vendor_content_type(methods, p)
 
-        return method
+            future_model = method(*self.path_args, **kwargs)
 
-    def _check_vendor_content_type(self, methods, p):
-        '''Execute the correct function based on the vendor content type or
-        riase a 406 HTTP status.'''
-        methods = list(ifilter(lambda k: k.vendor == p['vendor'], methods))
-        l = len(methods)
-        if l == 0:
-            # TODO return allowed content types
-            raise HTTPError(406)
-        elif l == 1:
-            return methods[0]
-        elif 'version' in p:
-            # still no luck, check if we have a correct version
-            # added to the vendor info
-            methods = ifilter(lambda k: k.version == p['version'])
+            callback = partial(self._provide_result, verb, headers)
+            future_model.add_done_callback(callback)
 
-            if len(methods) == 0:
-                # TODO return allowed content types
+    def _provide_result(self, verb, headers, future_model):
+        '''Find the correct provider for the result and call it with the final
+        result.'''
+        result = future_model.result()
+
+        if isinstance(result, ReturnInformationT):
+            self.set_header('Content-Type', 'application/json')
+            self.set_status(result.code)
+            self.write(json.dumps(result.message))
+
+        else:
+            try:
+                provider_class = ProviderBase.map_provider(
+                        headers.get('Accept', ''), self, allow_default=True)
+            except NoProviderFound:
                 raise HTTPError(406)
-            elif l == 1:
-                return methods[0]
-            # this means, that the client requested a vendor version that the
-            # server does not support.
-            raise HTTPError(406)
+
+            provider = provider_class()
+            if future_model.result():
+                provider.provide(future_model.result(), self)
+            else:
+                provider.provide(Ok, self)
+        self.finish()

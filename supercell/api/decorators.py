@@ -28,7 +28,7 @@ from collections import defaultdict
 from functools import wraps
 
 from tornado import gen
-from tornado.web import asynchronous
+from tornado.web import asynchronous, HTTPError
 
 from supercell.api import ContentType, RequestHandler
 from supercell._compat import ifilter
@@ -51,7 +51,7 @@ def async(fn):
     return asynchronous(gen.coroutine(fn))
 
 
-def provides(content_type, vendor=None, version=None, model=None):
+def provides(content_type, vendor=None, version=None, default=False):
     '''Class decorator for mapping HTTP GET responses to content types and their
     representation.
 
@@ -80,16 +80,20 @@ def provides(content_type, vendor=None, version=None, model=None):
         if not hasattr(cls, '_PROD_CONTENT_TYPES'):
             cls._PROD_CONTENT_TYPES = defaultdict(list)
 
-        cls._PROD_CONTENT_TYPES[content_type].append(ContentType(content_type,
-                                                                 vendor,
-                                                                 version,
-                                                                 model))
+        ctype = ContentType(content_type,
+                            vendor,
+                            version)
+        cls._PROD_CONTENT_TYPES[content_type].append(ctype)
+        if default:
+            assert 'default' not in cls._PROD_CONTENT_TYPES, 'TODO: nice msg'
+            cls._PROD_CONTENT_TYPES['default'] = ctype
+
         return cls
 
     return wrapper
 
 
-def consumes(content_type, vendor=None, version=None, model=None):
+def consumes(content_type, model, vendor=None, version=None):
     '''Class decorator for mapping HTTP POST and PUT bodies to
 
     Example::
@@ -107,12 +111,17 @@ def consumes(content_type, vendor=None, version=None, model=None):
         '''The real decorator.'''
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
                 'class decorator'
+        assert model, 'In order to consume content a schematics model ' + \
+                'class has to be given via the model parameter'
+
         if not hasattr(cls, '_CONS_CONTENT_TYPES'):
             cls._CONS_CONTENT_TYPES = defaultdict(list)
+        if not hasattr(cls, '_CONS_MODEL'):
+            cls._CONS_MODEL = dict()
 
-        cls._CONS_CONTENT_TYPES[content_type].append(ContentType(content_type,
-                                                                 vendor,
-                                                                 version,
-                                                                 model))
+        ct = ContentType(content_type, vendor, version)
+        cls._CONS_CONTENT_TYPES[content_type].append(ct)
+        cls._CONS_MODEL[ct] = model
         return cls
+
     return wrapper

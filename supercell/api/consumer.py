@@ -89,11 +89,11 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
                        if t[0] == c]
 
         if len(known_types) == 1:
-            return known_types[0][1]
+            return (handler._CONS_MODEL[c], known_types[0][1])
 
         raise NoConsumerFound()
 
-    def consume(self, handler):
+    def consume(self, handler, model):
         '''This method should return the correct representation as a simple
         string (i.e. byte buffer) that will be used as return value.
 
@@ -108,9 +108,9 @@ class JsonConsumer(ConsumerBase):
 
     CONTENT_TYPE = ContentType('application/json', None, None)
 
-    def consume(self, handler):
+    def consume(self, handler, model):
         '''Simply return the json via `json.dumps`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         '''
-        pass
+        return model(**json.loads(handler.request.body))

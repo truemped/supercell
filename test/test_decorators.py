@@ -36,13 +36,13 @@ class TestConsumesDecorator(TestCase):
     @raises(AssertionError)
     def test_on_non_class(self):
 
-        @consumes('application/json')
+        @consumes('application/json', object)
         def get():
             pass
 
     def test_simple_consumes_decorator_with_post(self):
 
-        @consumes('application/json')
+        @consumes('application/json', object)
         class MyHandler(RequestHandler):
 
             _CONS_CONTENT_TYPES = defaultdict(list)
@@ -57,11 +57,12 @@ class TestConsumesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
-        self.assertIsNone(content_type.model)
+        self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
 
     def test_consumes_decorator_with_vendor_info(self):
 
-        @consumes('application/json', 'ficture.light', version=1.0)
+        @consumes('application/json', object, vendor='ficture.light',
+                  version=1.0)
         class MyHandler(RequestHandler):
 
             def post(self):
@@ -74,11 +75,11 @@ class TestConsumesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
-        self.assertIsNone(content_type.model)
+        self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
 
     def test_consumes_decorator_with_model(self):
 
-        @consumes('application/json', model=object)
+        @consumes('application/json', object)
         class MyHandler(RequestHandler):
 
             def post(self):
@@ -91,7 +92,7 @@ class TestConsumesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
-        self.assertEqual(content_type.model, object)
+        self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
 
 
 class TestProvidesDecorator(TestCase):
@@ -119,7 +120,6 @@ class TestProvidesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
-        self.assertIsNone(content_type.model)
 
     def test_provides_decorator_with_vendor_info(self):
 
@@ -136,11 +136,10 @@ class TestProvidesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
-        self.assertIsNone(content_type.model)
 
     def test_provides_decorator_with_model(self):
 
-        @provides('application/json', model=object)
+        @provides('application/json')
         class MyHandler(RequestHandler):
 
             def update_stuff(self):
@@ -153,4 +152,3 @@ class TestProvidesDecorator(TestCase):
         self.assertEqual(content_type.content_type, 'application/json')
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
-        self.assertEqual(content_type.model, object)

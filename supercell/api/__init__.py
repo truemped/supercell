@@ -17,7 +17,7 @@
 #
 from __future__ import absolute_import, division, print_function, with_statement
 
-from supercell.api.metatypes import ContentType
+from supercell.api.metatypes import (ContentType, Return, Ok, Error, OkCreated)
 from supercell.api.requesthandler import RequestHandler
 from supercell.api.decorators import provides, consumes
 
@@ -26,5 +26,9 @@ __all__ = [
         'ContentType',
         'RequestHandler',
         'provides',
-        'consumes'
+        'consumes',
+        'Return',
+        'Ok',
+        'OkCreated',
+        'Error',
     ]

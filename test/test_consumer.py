@@ -43,12 +43,12 @@ class TestBasicConsumer(TestCase):
 
     def test_default_json_consumer(self):
 
-        @consumes('application/json')
+        @consumes('application/json', object)
         class MyHandler(RequestHandler):
             pass
 
-        consumer = ConsumerBase.map_consumer('application/json',
-                                             handler=MyHandler)
+        (_, consumer) = ConsumerBase.map_consumer('application/json',
+                                                  handler=MyHandler)
 
         self.assertIs(consumer, JsonConsumer)
 
@@ -58,12 +58,12 @@ class TestBasicConsumer(TestCase):
 
     def test_specific_json_consumer(self):
 
-        @consumes('application/json', vendor='supercell')
+        @consumes('application/json', object, vendor='supercell')
         class MyHandler(RequestHandler):
             pass
 
-        consumer = ConsumerBase.map_consumer('application/vnd.supercell+json',
-                                             handler=MyHandler)
+        (_, consumer) = ConsumerBase.map_consumer(
+                'application/vnd.supercell+json', handler=MyHandler)
         self.assertIs(consumer, MoreDetailedJsonConsumer)
 
         with self.assertRaises(NoConsumerFound):
@@ -71,11 +71,11 @@ class TestBasicConsumer(TestCase):
 
     def test_json_consumer_with_version(self):
 
-        @consumes('application/json', vendor='supercell', version=1.0)
+        @consumes('application/json', object, vendor='supercell', version=1.0)
         class MyHandler(RequestHandler):
             pass
 
-        consumer = ConsumerBase.map_consumer(
+        (_, consumer) = ConsumerBase.map_consumer(
                 'application/vnd.supercell-v1.0+json', handler=MyHandler)
         self.assertIs(consumer, JsonConsumerWithVendorAndVersion)
 
