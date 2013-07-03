@@ -82,7 +82,6 @@ class Environment(object):
                                                socket.gethostname())
         return self._config_name
 
-    @property
     def tornado_log_function(self, logger):
         '''Return a function that will log tornado requests.'''
         if not hasattr(self, '_log_function'):
