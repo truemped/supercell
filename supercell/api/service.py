@@ -44,22 +44,31 @@ class Service(object):
 
     def main(self):
         '''Main method starting a `supercell` process.'''
+        app = self.get_app()
 
+        server = HTTPServer(app)
+        server.bind(self.config.port, address=self.config.address)
+        server.start(1)
+
+        self.slog.info('Starting supercell')
+        IOLoop.instance().start()
+
+    def get_app(self):
+        '''Create the `tornado.web.Appliaction` instance and return it.'''
         # bootstrap the service
         self.bootstrap()
-
-        # initialize logging
-        slog = self.initialize_logging()
 
         # add handlers, health checks and others to the environment
         self.run()
 
-        server = HTTPServer(self.environment.application)
-        server.bind(self.config.port, address=self.config.address)
-        server.start(1)
+        return self.environment.application
 
-        slog.info('Starting supercell')
-        IOLoop.instance().start()
+    @property
+    def slog(self):
+        '''Initialize the logging and return the logger.'''
+        if not hasattr(self, '_slog'):
+            self._slog = self.initialize_logging()
+        return self._slog
 
     @property
     def environment(self):
@@ -84,9 +93,11 @@ class Service(object):
         '''Parse the config files and return the `config` object, i.e. the
         `tornado.options.options` instance.'''
         filename = self.environment.config_name
+        print(self.environment.config_file_paths)
         for path in self.environment.config_file_paths:
             cfg = os.path.join(path, 'config.cfg')
             if os.path.exists(cfg):
+                print(cfg)
                 tornado.options.parse_config_file(cfg)
 
             cfg = os.path.join(path, filename)
@@ -98,10 +109,11 @@ class Service(object):
         values.'''
         tornado.options.parse_command_line()
 
-    def initialize_logging(self,):
+    def initialize_logging(self, name='supercell'):
         '''Initialize the python logging system.'''
+        print(self.config.logconf)
         logging.config.fileConfig(self.config.logconf)
-        slog = logging.getLogger('supercell')
+        slog = logging.getLogger(name)
         ts = self.environment.tornado_settings
         ts['log_function'] = self.environment.tornado_log_function(slog)
         return slog
