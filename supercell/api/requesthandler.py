@@ -19,10 +19,9 @@ from __future__ import absolute_import, division, print_function, with_statement
 from functools import partial
 import json
 
-from tornado import gen
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.api import Ok, Error, Return
+from supercell.api import Ok
 from supercell.api.metatypes import ReturnInformationT
 from supercell.api.consumer import ConsumerBase, NoConsumerFound
 from supercell.api.provider import ProviderBase, NoProviderFound
@@ -44,9 +43,18 @@ class RequestHandler(rq):
         verbs.'''
         super(RequestHandler, self).__init__(*args, **kwargs)
 
+    @property
+    def environment(self):
+        '''Convinience method for accessing the environment.'''
+        return self.application.environment
+
+    @property
+    def config(self):
+        '''Convinience method for accessing the environment.'''
+        return self.application.config
+
     def _execute_method(self):
-        '''
-        Execute the request.
+        '''Execute the request.
 
         The method to be executed is determined by the request method.
         '''

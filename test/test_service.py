@@ -48,7 +48,10 @@ class MyHandler(s.RequestHandler):
 
     @s.async
     def post(self, doc_id, model=None):
+        assert isinstance(self.environment, Environment)
+        assert isinstance(self.config, tornado.options.options)
         raise s.OkCreated({'docid': 123})
+
 
 class MyService(s.Service):
 
@@ -56,8 +59,8 @@ class MyService(s.Service):
         self.environment.config_file_paths.append('test/')
 
     def run(self):
-
         self.environment.add_handler('/test', MyHandler, {})
+        self.environment.add_handler('/test/(\d+)', MyHandler, {})
 
 
 class ServiceTest(TestCase):

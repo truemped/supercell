@@ -61,7 +61,10 @@ class Service(object):
         # add handlers, health checks and others to the environment
         self.run()
 
-        return self.environment.application
+        # do not allow any changes on managed objects anymore.
+        self.environment.finalize_managed_objects()
+
+        return self.environment.application(self.config)
 
     @property
     def slog(self):

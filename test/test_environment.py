@@ -32,7 +32,7 @@ class EnvironmentTest(TestCase):
 
     def test_simple_app_creation(self):
         env = Environment()
-        app = env.application
+        app = env.application({})
         self.assertIsInstance(app, Application)
         self.assertEqual(len(app.handlers), 0)
 
@@ -52,9 +52,34 @@ class EnvironmentTest(TestCase):
 
         self.assertEqual(len(env._handlers), 1)
 
-        app = env.application
+        app = env.application({})
         self.assertEqual(len(app.handlers), 1)
         (host_pattern, [spec]) = app.handlers[0]
         self.assertEqual(host_pattern.pattern, '.*$')
         self.assertEqual(spec.regex.pattern, '/test$')
         self.assertEqual(spec.handler_class, MyHandler)
+
+    def test_managed_object_access(self):
+        env = Environment()
+
+        managed = object()
+        env.add_managed_object('i_am_managed', managed)
+        self.assertEqual(managed, env.i_am_managed)
+
+    def test_no_overwriting_of_managed_objects(self):
+        env = Environment()
+        managed = object()
+        env.add_managed_object('i_am_managed', managed)
+
+        self.assertEqual(managed, env.i_am_managed)
+        with self.assertRaises(AssertionError):
+            env.add_managed_object('i_am_managed', object())
+
+    def test_finalizing_managed_objects(self):
+        env = Environment()
+        managed = object()
+        env.add_managed_object('i_am_managed', managed)
+        env.finalize_managed_objects()
+
+        with self.assertRaises(AssertionError):
+            env.add_managed_object('another_managed', object())
