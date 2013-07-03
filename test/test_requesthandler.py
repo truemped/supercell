@@ -20,7 +20,6 @@ from __future__ import absolute_import, division, print_function, with_statement
 from schematics.models import Model
 from schematics.types import StringType
 
-from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
@@ -37,7 +36,7 @@ class SimpleMessage(Model):
 @provides('application/json')
 class MyHandler(RequestHandler):
 
-    @gen.coroutine
+    @s.async
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
@@ -45,7 +44,7 @@ class MyHandler(RequestHandler):
 @provides('application/json', default=True)
 class MyHandlerWithDefault(RequestHandler):
 
-    @gen.coroutine
+    @s.async
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
@@ -53,17 +52,17 @@ class MyHandlerWithDefault(RequestHandler):
 @consumes('application/json', SimpleMessage)
 class MyEchoHandler(RequestHandler):
 
-    @gen.coroutine
+    @s.async
     def get(self, *args, **kwargs):
         q = self.get_argument('q')
         # query solr:
         raise s.Return(SimpleMessage(doc_id='test456', message='q: %s' % q))
 
-    @gen.coroutine
+    @s.async
     def post(self, *args, **kwargs):
         model = kwargs.get('model')
         # do something with model
-        raise s.OkCreated()
+        raise s.OkCreated({'docid': 123})
 
 
 class TestSimpleRequestHandler(AsyncHTTPTestCase):
@@ -105,3 +104,4 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
                               headers={'Content-Type': 'application/json'},
                               body='{"message": "Simple message"}')
         self.assertEqual(response.code, 201)
+        self.assertEqual(response.body, '{"docid": 123, "ok": true}')

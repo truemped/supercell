@@ -128,5 +128,4 @@ class JsonProvider(ProviderBase):
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         '''
-        handler.set_header('Content-Type', 'application/json')
-        handler.write(json.dumps(model.validate()))
+        handler.write(model.validate())

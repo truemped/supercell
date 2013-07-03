@@ -26,7 +26,6 @@ else:
 from mock import patch
 from schematics.models import Model
 from schematics.types import StringType
-from tornado import gen
 from tornado.ioloop import IOLoop
 import tornado.options
 from tornado.testing import AsyncHTTPTestCase
@@ -40,11 +39,16 @@ class SimpleModel(Model):
 
 
 @s.provides('application/json')
+@s.consumes('application/json', SimpleModel)
 class MyHandler(s.RequestHandler):
-    @gen.coroutine
+
+    @s.async
     def get(self):
         raise s.Return(SimpleModel(msg='Holy moly'))
 
+    @s.async
+    def post(self, doc_id, model=None):
+        raise s.OkCreated({'docid': 123})
 
 class MyService(s.Service):
 
@@ -52,6 +56,7 @@ class MyService(s.Service):
         self.environment.config_file_paths.append('test/')
 
     def run(self):
+
         self.environment.add_handler('/test', MyHandler, {})
 
 

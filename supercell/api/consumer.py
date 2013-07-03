@@ -106,11 +106,12 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
 class JsonConsumer(ConsumerBase):
     '''Default `application/json` provider.'''
 
-    CONTENT_TYPE = ContentType('application/json', None, None)
+    CONTENT_TYPE = ContentType('application/json')
 
     def consume(self, handler, model):
         '''Simply return the json via `json.dumps`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         '''
+        # TODO error if no request body is set
         return model(**json.loads(handler.request.body))
