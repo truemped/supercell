@@ -33,8 +33,8 @@ idea::
         content = StringType()
 
 
-    @produces(MediaType.APPLICATION_JSON)
-    class SimpleExampleHandler(RequestHandler):
+    @produces(s.MediaType.APPLICATION_JSON)
+    class SimpleExampleHandler(s.RequestHandler):
 
         @s.async
         def get(self):
@@ -43,7 +43,7 @@ idea::
             raise s.Return(Saying(id=12, content=template.render(name=name)))
 
 
-    class MyService(Service):
+    class MyService(s.Service):
         
         def bootstrap(self):
             self.environment.configFilePaths.append('./etc/')
