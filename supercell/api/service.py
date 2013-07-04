@@ -38,6 +38,9 @@ define('port', default=8080, help='Port to listen on')
 define('address', default='127.0.0.1', help='Address to bind on')
 
 
+define('socketfd', default=None, help='Filedescriptor used from circus')
+
+
 class Service(object):
     '''Main service implementation managing the `tornado.web.Application` and
     taking care of configuration.'''
@@ -47,8 +50,15 @@ class Service(object):
         app = self.get_app()
 
         server = HTTPServer(app)
-        server.bind(self.config.port, address=self.config.address)
-        server.start(1)
+
+        if self.config.socketfd:
+            import socket
+            sock = socket.fromfd(int(self.config.socketfd), socket.AF_INET,
+                                 socket.SOCK_STREAM)
+            server.add_socket(sock)
+        else:
+            server.bind(self.config.port, address=self.config.address)
+            server.start(1)
 
         self.slog.info('Starting supercell')
         IOLoop.instance().start()
