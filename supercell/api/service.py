@@ -96,11 +96,9 @@ class Service(object):
         '''Parse the config files and return the `config` object, i.e. the
         `tornado.options.options` instance.'''
         filename = self.environment.config_name
-        print(self.environment.config_file_paths)
         for path in self.environment.config_file_paths:
             cfg = os.path.join(path, 'config.cfg')
             if os.path.exists(cfg):
-                print(cfg)
                 tornado.options.parse_config_file(cfg)
 
             cfg = os.path.join(path, filename)
@@ -114,7 +112,6 @@ class Service(object):
 
     def initialize_logging(self, name='supercell'):
         '''Initialize the python logging system.'''
-        print(self.config.logconf)
         logging.config.fileConfig(self.config.logconf)
         slog = logging.getLogger(name)
         ts = self.environment.tornado_settings
