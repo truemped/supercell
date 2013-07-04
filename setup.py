@@ -17,7 +17,7 @@
 #
 from imp import load_source
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 import sys
 
 
@@ -50,14 +50,14 @@ setup (
     author_email = 'truemped@gmail.com',
     url = 'http://truemped.github.com/supercell',
     description = '',
-
-    packages = find_packages(exclude=['vows']),
+    packages = ['supercell', 'supercell.api', 'supercell.utils'],
 
     install_requires = [
         'tornado >= 3.1.0',
         'schematics == 0.6.0',
         'scales == 1.0.3',
     ],
+
     tests_require = tests_require,
     extras_require = extras_require,
     classifiers = [
