@@ -25,14 +25,11 @@ so you don't have to.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import defaultdict
-from functools import wraps
 
 from tornado import gen
-from tornado.web import asynchronous, HTTPError
+from tornado.web import asynchronous
 
-from supercell.api import ContentType, RequestHandler
-from supercell._compat import ifilter
-from supercell.utils import parse_accept_header
+from supercell.api import ContentType
 
 
 def async(fn):
@@ -58,7 +55,7 @@ def provides(content_type, vendor=None, version=None, default=False):
     In order to allow the **application/json** content type, create the handler
     class like this::
 
-        @provides('application/json')
+        @provides(MediaType.ApplicationJson)
         class MyHandler(RequestHandler):
             pass
 
@@ -67,7 +64,7 @@ def provides(content_type, vendor=None, version=None, default=False):
     present, ordering of the `provides` decorators matter, i.e. the first
     content type is used::
 
-        @provides('application/json', model=MyModel)
+        @provides(MediaType.ApplicationJson, model=MyModel)
         class MyHandler(RequestHandler):
             pass
     '''
@@ -98,13 +95,13 @@ def consumes(content_type, model, vendor=None, version=None):
 
     Example::
 
-        @consumes('application/json')
+        @consumes(MediaType.ApplicationJson, model=Model)
         class MyHandler(RequestHandler):
 
             @post
             def do_something_with_json(self, *args, **kwargs):
                 # ...
-                yield Response.OK
+                raise Ok()
     '''
 
     def wrapper(cls):

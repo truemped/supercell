@@ -38,8 +38,8 @@ class SimpleModel(Model):
     msg = StringType()
 
 
-@s.provides('application/json')
-@s.consumes('application/json', SimpleModel)
+@s.provides(s.MediaType.ApplicationJson)
+@s.consumes(s.MediaType.ApplicationJson, SimpleModel)
 class MyHandler(s.RequestHandler):
 
     @s.async
@@ -105,6 +105,6 @@ class ApplicationIntegrationTest(AsyncHTTPTestCase):
         return service.get_app()
 
     def test_simple_get(self):
-        response = self.fetch('/test', headers={'Accept': 'application/json'})
+        response = self.fetch('/test', headers={'Accept': s.MediaType.ApplicationJson})
         self.assertEqual(200, response.code)
         self.assertEqual('{"msg": "Holy moly"}', response.body)

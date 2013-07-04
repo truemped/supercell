@@ -27,7 +27,7 @@ else:
 
 from nose.tools import raises
 
-from supercell.api import (RequestHandler, provides, consumes)
+from supercell.api import (RequestHandler, provides, consumes, MediaType)
 
 
 class TestConsumesDecorator(TestCase):
@@ -36,13 +36,13 @@ class TestConsumesDecorator(TestCase):
     @raises(AssertionError)
     def test_on_non_class(self):
 
-        @consumes('application/json', object)
+        @consumes(MediaType.ApplicationJson, object)
         def get():
             pass
 
     def test_simple_consumes_decorator_with_post(self):
 
-        @consumes('application/json', object)
+        @consumes(MediaType.ApplicationJson, object)
         class MyHandler(RequestHandler):
 
             _CONS_CONTENT_TYPES = defaultdict(list)
@@ -52,16 +52,16 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
 
     def test_consumes_decorator_with_vendor_info(self):
 
-        @consumes('application/json', object, vendor='ficture.light',
+        @consumes(MediaType.ApplicationJson, object, vendor='ficture.light',
                   version=1.0)
         class MyHandler(RequestHandler):
 
@@ -70,16 +70,16 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
 
     def test_consumes_decorator_with_model(self):
 
-        @consumes('application/json', object)
+        @consumes(MediaType.ApplicationJson, object)
         class MyHandler(RequestHandler):
 
             def post(self):
@@ -87,9 +87,9 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
@@ -101,13 +101,13 @@ class TestProvidesDecorator(TestCase):
     @raises(AssertionError)
     def test_on_non_class(self):
 
-        @provides('application/json')
+        @provides(MediaType.ApplicationJson)
         def get():
             pass
 
     def test_simple_provides_decorator_with_post(self):
 
-        @provides('application/json')
+        @provides(MediaType.ApplicationJson)
         class MyHandler(RequestHandler):
             _PROD_CONTENT_TYPES = defaultdict(list)
 
@@ -115,15 +115,15 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
 
     def test_provides_decorator_with_vendor_info(self):
 
-        @provides('application/json', 'ficture.light', version=1.0)
+        @provides(MediaType.ApplicationJson, 'ficture.light', version=1.0)
         class MyHandler(RequestHandler):
 
             def update_stuff(self):
@@ -131,15 +131,15 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
 
     def test_provides_decorator_with_model(self):
 
-        @provides('application/json')
+        @provides(MediaType.ApplicationJson)
         class MyHandler(RequestHandler):
 
             def update_stuff(self):
@@ -147,8 +147,8 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue('application/json' in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES['application/json'][0]
-        self.assertEqual(content_type.content_type, 'application/json')
+        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)

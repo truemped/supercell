@@ -24,18 +24,18 @@ else:
     from unittest2 import TestCase
 
 from supercell.api import consumes, RequestHandler
-from supercell.api.metatypes import ContentType
+from supercell.api.metatypes import ContentType, MediaType
 from supercell.api.consumer import ConsumerBase, JsonConsumer, NoConsumerFound
 
 
 class MoreDetailedJsonConsumer(JsonConsumer):
 
-    CONTENT_TYPE = ContentType('application/json', vendor='supercell')
+    CONTENT_TYPE = ContentType(MediaType.ApplicationJson, vendor='supercell')
 
 
 class JsonConsumerWithVendorAndVersion(JsonConsumer):
 
-    CONTENT_TYPE = ContentType('application/json', vendor='supercell',
+    CONTENT_TYPE = ContentType(MediaType.ApplicationJson, vendor='supercell',
                                version=1.0)
 
 
@@ -43,11 +43,11 @@ class TestBasicConsumer(TestCase):
 
     def test_default_json_consumer(self):
 
-        @consumes('application/json', object)
+        @consumes(MediaType.ApplicationJson, object)
         class MyHandler(RequestHandler):
             pass
 
-        (_, consumer) = ConsumerBase.map_consumer('application/json',
+        (_, consumer) = ConsumerBase.map_consumer(MediaType.ApplicationJson,
                                                   handler=MyHandler)
 
         self.assertIs(consumer, JsonConsumer)
@@ -58,7 +58,7 @@ class TestBasicConsumer(TestCase):
 
     def test_specific_json_consumer(self):
 
-        @consumes('application/json', object, vendor='supercell')
+        @consumes(MediaType.ApplicationJson, object, vendor='supercell')
         class MyHandler(RequestHandler):
             pass
 
@@ -67,11 +67,13 @@ class TestBasicConsumer(TestCase):
         self.assertIs(consumer, MoreDetailedJsonConsumer)
 
         with self.assertRaises(NoConsumerFound):
-            ConsumerBase.map_consumer('application/json', handler=MyHandler)
+            ConsumerBase.map_consumer(MediaType.ApplicationJson,
+                                      handler=MyHandler)
 
     def test_json_consumer_with_version(self):
 
-        @consumes('application/json', object, vendor='supercell', version=1.0)
+        @consumes(MediaType.ApplicationJson, object, vendor='supercell',
+                  version=1.0)
         class MyHandler(RequestHandler):
             pass
 
@@ -80,4 +82,5 @@ class TestBasicConsumer(TestCase):
         self.assertIs(consumer, JsonConsumerWithVendorAndVersion)
 
         with self.assertRaises(NoConsumerFound):
-            ConsumerBase.map_consumer('application/json', handler=MyHandler)
+            ConsumerBase.map_consumer(MediaType.ApplicationJson,
+                                      handler=MyHandler)

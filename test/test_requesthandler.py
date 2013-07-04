@@ -33,7 +33,7 @@ class SimpleMessage(Model):
     message = StringType()
 
 
-@provides('application/json')
+@provides(s.MediaType.ApplicationJson)
 class MyHandler(RequestHandler):
 
     @s.async
@@ -41,7 +41,7 @@ class MyHandler(RequestHandler):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
 
-@provides('application/json', default=True)
+@provides(s.MediaType.ApplicationJson, default=True)
 class MyHandlerWithDefault(RequestHandler):
 
     @s.async
@@ -49,7 +49,7 @@ class MyHandlerWithDefault(RequestHandler):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
 
-@consumes('application/json', SimpleMessage)
+@consumes(s.MediaType.ApplicationJson, SimpleMessage)
 class MyEchoHandler(RequestHandler):
 
     @s.async
@@ -79,7 +79,7 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
         return IOLoop.instance()
 
     def test_simple_handler(self):
-        response = self.fetch('/test', headers={'Accept': 'application/json'})
+        response = self.fetch('/test', headers={'Accept': s.MediaType.ApplicationJson})
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body,
                          '{"message": "A test", "doc_id": "test123"}')
@@ -101,7 +101,7 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
 
     def test_post_handler(self):
         response = self.fetch('/test_post', method='POST',
-                              headers={'Content-Type': 'application/json'},
+                              headers={'Content-Type': s.MediaType.ApplicationJson},
                               body='{"message": "Simple message"}')
         self.assertEqual(response.code, 201)
         self.assertEqual(response.body, '{"docid": 123, "ok": true}')

@@ -24,7 +24,7 @@ from collections import defaultdict
 import json
 
 from supercell._compat import with_metaclass
-from supercell.api import ContentType
+from supercell.api import ContentType, MediaType
 from supercell.utils import parse_accept_header
 
 
@@ -121,7 +121,7 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
 class JsonProvider(ProviderBase):
     '''Default `application/json` provider.'''
 
-    CONTENT_TYPE = ContentType('application/json')
+    CONTENT_TYPE = ContentType(MediaType.ApplicationJson)
 
     def provide(self, model, handler):
         '''Simply return the json via `json.dumps`.

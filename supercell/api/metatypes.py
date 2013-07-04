@@ -31,6 +31,13 @@ def ContentType(content_type, vendor=None, version=None):
     return ContentTypeT(content_type, vendor, version)
 
 
+class MediaType(object):
+    '''Collection of content types.'''
+
+    ApplicationJson = 'application/json'
+    '''Content type for `application/json`'''
+
+
 ReturnInformationT = namedtuple('ReturnInformation', ['code', 'message'])
 
 

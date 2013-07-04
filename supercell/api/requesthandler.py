@@ -21,7 +21,7 @@ import json
 
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.api import Ok
+from supercell.api import Ok, MediaType
 from supercell.api.metatypes import ReturnInformationT
 from supercell.api.consumer import ConsumerBase, NoConsumerFound
 from supercell.api.provider import ProviderBase, NoProviderFound
@@ -86,7 +86,7 @@ class RequestHandler(rq):
         result = future_model.result()
 
         if isinstance(result, ReturnInformationT):
-            self.set_header('Content-Type', 'application/json')
+            self.set_header('Content-Type', MediaType.ApplicationJson)
             self.set_status(result.code)
             self.write(json.dumps(result.message))
 

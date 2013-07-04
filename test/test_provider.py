@@ -24,18 +24,18 @@ else:
     from unittest2 import TestCase
 
 from supercell.api import provides, RequestHandler
-from supercell.api.metatypes import ContentType
+from supercell.api.metatypes import ContentType, MediaType
 from supercell.api.provider import ProviderBase, JsonProvider, NoProviderFound
 
 
 class MoreDetailedJsonProvider(JsonProvider):
 
-    CONTENT_TYPE = ContentType('application/json', vendor='supercell')
+    CONTENT_TYPE = ContentType(MediaType.ApplicationJson, vendor='supercell')
 
 
 class JsonProviderWithVendorAndVersion(JsonProvider):
 
-    CONTENT_TYPE = ContentType('application/json', vendor='supercell',
+    CONTENT_TYPE = ContentType(MediaType.ApplicationJson, vendor='supercell',
                                version=1.0)
 
 
@@ -43,11 +43,11 @@ class TestBasicProvider(TestCase):
 
     def test_default_json_provider(self):
 
-        @provides('application/json')
+        @provides(MediaType.ApplicationJson)
         class MyHandler(RequestHandler):
             pass
 
-        provider = ProviderBase.map_provider('application/json',
+        provider = ProviderBase.map_provider(MediaType.ApplicationJson,
                                              handler=MyHandler)
         self.assertIs(provider, JsonProvider)
 
@@ -57,7 +57,7 @@ class TestBasicProvider(TestCase):
 
     def test_specific_json_provider(self):
 
-        @provides('application/json', vendor='supercell')
+        @provides(MediaType.ApplicationJson, vendor='supercell')
         class MyHandler(RequestHandler):
             pass
 
@@ -67,7 +67,7 @@ class TestBasicProvider(TestCase):
 
     def test_json_provider_with_version(self):
 
-        @provides('application/json', vendor='supercell', version=1.0)
+        @provides(MediaType.ApplicationJson, vendor='supercell', version=1.0)
         class MyHandler(RequestHandler):
 
             def __init__(self, *args, **kwargs):
