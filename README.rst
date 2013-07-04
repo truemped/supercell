@@ -1,4 +1,4 @@
-SuperCell
+supercell
 =========
 
 SuperCell is a collection of best practices for creating with Tornado based
@@ -14,13 +14,9 @@ Code is worth more than words, so this is a simple example demonstrating the
 idea::
 
     from tornado import options
-    from tornado.gen import coroutine
-
-    from supercell.api import produces, get, RequestHandler, MediaType, Service
-    from supercell.healthcheck import HealthCheck, Healthy, Unhealthy
-    from supercell.scales import Timed
-    from supercell.schematics.models import Model
-    from supercell.schematics.types import StringType, IntType
+    from schematics.models import Model
+    from schematics.types import StringType
+    import supercell.api as s
 
 
     options.define('defaultName', default='Your Name', type=str,
@@ -40,41 +36,26 @@ idea::
     @produces(MediaType.APPLICATION_JSON)
     class SimpleExampleHandler(RequestHandler):
 
-        @get
-        @timed
-        def returnResults(self):
+        @s.async
+        def get(self):
             template = self.config['HELLO_WORLD_TEMPLATE']
             name = self.get_argument('name', self.config['DEFAULT_NAME'])
-            yield Saying(id=12, content=template.render(name=name))
-
-
-    class DummyHealthCheck(HealthCheck):
-
-        @gen.coroutine
-        def check(self):
-            solrCheck = yield checkSolr()
-            if not solrCheck.ok():
-                yield Unhealthy(reason='Bad solr! Details: %s' % solrCheck)
-            else:
-                yield Healthy()
+            raise s.Return(Saying(id=12, content=template.render(name=name)))
 
 
     class MyService(Service):
         
-        def bootstrap(self, env):
-            env.configFilePaths.append('./etc/')
-            env.configFilePaths.append('/etc/myservice/')
+        def bootstrap(self):
+            self.environment.configFilePaths.append('./etc/')
+            self.environment.configFilePaths.append('/etc/myservice/')
 
-        def run(self, conf, env):
+        def run(self):
 
             # add our handler
             self.add_handler('/hello-world', SimpleExampleHandler,
-                             {'HELLO_WORLD_TEMPLATE': conf.template,
-                              'DEFAULT_NAME': conf.defaultName},
+                             {'HELLO_WORLD_TEMPLATE': self.config.template,
+                              'DEFAULT_NAME': self.config.defaultName},
                              name='hello-world')
-
-            self.add_health_check(DummyHealthCheck)
-
 
     if __name__ == '__main__':
         MyService().main()
@@ -120,12 +101,11 @@ use the ``PyCURL`` client, if available and fallback to the
 
 In order to add this to your environment you simply have to::
 
-    def run(self, conf, env):
-        from supercell.managed import AsyncHTTPClient
-        env.add_managed_object('http_client', AsynchronousHttpClient)
+    def run(self):
+        env.add_managed_object('http_client', AsynchHTTPClient)
 
 In you handler code you may then get access to the client via the environment::
 
     ...
-    client = env.get_managed_object('http_client')
+    client = self.environment.http_client
     ...
