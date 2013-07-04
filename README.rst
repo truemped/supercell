@@ -33,7 +33,7 @@ idea::
         content = StringType()
 
 
-    @produces(s.MediaType.APPLICATION_JSON)
+    @produces(s.MediaType.ApplicationJson)
     class SimpleExampleHandler(s.RequestHandler):
 
         @s.async
