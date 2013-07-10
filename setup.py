@@ -48,7 +48,7 @@ setup (
 
     author='Daniel Truemper',
     author_email='truemped@gmail.com',
-    url='http://truemped.github.com/supercell',
+    url='http://github.com/truemped/supercell',
     license="http://www.apache.org/licenses/LICENSE-2.0",
 
     description='',
