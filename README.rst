@@ -7,8 +7,10 @@ HTTP APIs. It resembles many ideas from Coda Hale's
 for JVM based HTTP APIs.
 
 
-.. image:: https://travis-ci.org/truemped/supercell.png?branch=master!:https://travis-ci.org/truemped/supercell
-.. image:: https://codeq.io/github/truemped/supercell/badges/master.png
+.. |TravisImage| image:: https://travis-ci.org/truemped/supercell.png?branch=master
+.. _TravisImage: https://travis-ci.org/truemped/supercell
+.. |CodeQ| image:: https://codeq.io/github/truemped/supercell/badges/master.png
+.. _CodeQ: https://codeq.io/github/truemped/supercell/branches/master
 
 
 Example
