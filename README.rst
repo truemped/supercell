@@ -6,6 +6,7 @@ HTTP APIs. It resembles many ideas from Coda Hale's
 `Dropwizard <http://dropwizard.codahale.com/>`_, a similar library
 for JVM based HTTP APIs.
 
+|TravisImage|_ |CodeQ|_
 
 .. |TravisImage| image:: https://travis-ci.org/truemped/supercell.png?branch=master
 .. _TravisImage: https://travis-ci.org/truemped/supercell
