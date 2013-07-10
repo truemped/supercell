@@ -109,3 +109,28 @@ In you handler code you may then get access to the client via the environment::
     ...
     client = self.environment.http_client
     ...
+
+
+Caching
+=======
+
+A simple decorator allows for fine grained control of public and browser
+caches. The basic idea is to::
+
+    class MyHandler(s.RequestHandler):
+
+        @s.async
+        @s.cache(timedelta(minutes=10))
+        def get(self):
+            raise s.Ok()
+
+This will allow all caches to store a local copy of your response and serve it
+for 10 minutes. By default the `must_revalidate` option is set, so that a cache
+may not serve a stale copy but revalidate it when it is expired. So in this
+example the header is set to::
+
+    Cache-Control: max-age=600, must-revalidate
+
+For a detailed description of the available options see the `Caching
+Tutorial <http://www.mnot.net/cache_docs/>` and the official `RFC2616, sec
+14.9 <http://www.ietf.org/rfc/rfc2616.txt>`.

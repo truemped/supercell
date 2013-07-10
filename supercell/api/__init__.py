@@ -20,12 +20,13 @@ from __future__ import absolute_import, division, print_function, with_statement
 from supercell.api.metatypes import (ContentType, MediaType, Return, Ok,
                                      Error, OkCreated)
 from supercell.api.requesthandler import RequestHandler
-from supercell.api.decorators import provides, consumes, async
+from supercell.api.decorators import provides, consumes, async, cache
 from supercell.api.service import Service
 
 
 __all__ = [
         'async',
+        'cache',
         'ContentType',
         'MediaType',
         'RequestHandler',

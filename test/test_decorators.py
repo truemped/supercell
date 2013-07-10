@@ -18,6 +18,7 @@
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import defaultdict
+from datetime import timedelta
 
 import sys
 if sys.version_info > (2, 7):
@@ -26,7 +27,14 @@ else:
     from unittest2 import TestCase
 
 from nose.tools import raises
+from schematics.models import Model
+from schematics.types import StringType
 
+from tornado.ioloop import IOLoop
+from tornado.testing import AsyncHTTPTestCase
+from tornado.web import Application
+
+import supercell.api as s
 from supercell.api import (RequestHandler, provides, consumes, MediaType)
 
 
@@ -152,3 +160,73 @@ class TestProvidesDecorator(TestCase):
         self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
+
+
+class SimpleMessage(Model):
+    doc_id = StringType()
+    message = StringType()
+
+
+@provides(s.MediaType.ApplicationJson, default=True)
+class MyHandler(RequestHandler):
+
+    @s.async
+    @s.cache(timedelta(minutes=10))
+    def get(self, *args, **kwargs):
+        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+
+@provides(s.MediaType.ApplicationJson, default=True)
+class MyExtremeCachingHandler(RequestHandler):
+
+    @s.async
+    @s.cache(timedelta(minutes=10), s_max_age=timedelta(minutes=10),
+             public=True, must_revalidate=True,
+             proxy_revalidate=True)
+    def get(self, *args, **kwargs):
+        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+
+@provides(s.MediaType.ApplicationJson, default=True)
+class MyPrivateCaching(RequestHandler):
+
+    @s.async
+    @s.cache(timedelta(seconds=10), s_max_age=timedelta(seconds=0),
+             private=True, no_store=True)
+    def get(self, *args, **kwargs):
+        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+
+class TestCacheDecorator(AsyncHTTPTestCase):
+
+    def get_new_ioloop(self):
+        return IOLoop.instance()
+
+    def get_app(self):
+        return Application([
+            (r'/', MyHandler),
+            (r'/cache', MyExtremeCachingHandler),
+            (r'/private', MyPrivateCaching),
+        ])
+
+    def test_simple_timedelta(self):
+        response = self.fetch('/')
+        self.assertEqual(response.code, 200)
+        self.assertTrue('Cache-Control' in response.headers)
+        self.assertEqual('max-age=600, must-revalidate',
+                         response.headers['Cache-Control'])
+
+    def test_extreme_cache(self):
+        response = self.fetch('/cache')
+        self.assertEqual(response.code, 200)
+        self.assertTrue('Cache-Control' in response.headers)
+        self.assertEqual('max-age=600, s-max-age=600, public, ' + \
+                            'must-revalidate, proxy-revalidate',
+                         response.headers['Cache-Control'])
+
+    def test_private_cache(self):
+        response = self.fetch('/private')
+        self.assertEqual(response.code, 200)
+        self.assertTrue('Cache-Control' in response.headers)
+        self.assertEqual('max-age=10, private, no-store, must-revalidate',
+                         response.headers['Cache-Control'])

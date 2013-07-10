@@ -25,6 +25,7 @@ so you don't have to.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import defaultdict
+from functools import wraps
 
 from tornado import gen
 from tornado.web import asynchronous
@@ -121,4 +122,79 @@ def consumes(content_type, model, vendor=None, version=None):
         cls._CONS_MODEL[ct] = model
         return cls
 
+    return wrapper
+
+
+def cache(max_age, s_max_age=None, public=False, private=False, no_cache=False,
+          no_store=False, must_revalidate=True, proxy_revalidate=False):
+    '''Set the `Cache-Control` HTTP header to allow for fine grained caching
+    controls.
+
+    For detailed information read http://www.mnot.net/cache_docs/ and
+    http://www.ietf.org/rfc/rfc2616.txt
+
+    Usage::
+
+        @cache(timedelta(minutes=10))
+        def get(self):
+            self.finish({'ok': True})
+
+    This would allow public caches to store the result for 10 minutes.
+
+    :param max_age: Number of seconds the response can be cached
+    :type max_age: datetime.timedelta
+
+    :param s_max_age: Like `max_age` but only applies to shared caches
+    :type s_max_age: datetime.timedelta
+
+    :param public: Marks responses as cachable even if they contain
+                   authentication information
+    :type public: bool
+
+    :param private: Allows the browser to cache the result but not shared
+                    caches
+    :type private: bool
+
+    :param no_cache: If *True* caches will revalidate the request before
+                     delivering the cached copy
+    :type no_cache: bool
+
+    :param no_store: Caches should not store any cached copy.
+    :type no_store: bool
+
+    :param must_revalidate: Tells the cache to not serve stale copies of the
+                            response
+    :type must_revalidate: bool
+
+    :param proxy_revalidate: Like `must_revalidate` except it only applies to
+                             public caches
+    :type proxy_revalidate: bool
+    '''
+
+    def wrapper(fn):
+
+        @wraps(fn)
+        def _func(self, *args, **kwargs):
+            '''Inner method setting the HTTP header according to the params.'''
+            params = []
+            params.append('max-age=%s' % max_age.seconds)
+            if s_max_age:
+                params.append('s-max-age=%s' % s_max_age.seconds)
+            if public:
+                params.append('public')
+            if private:
+                params.append('private')
+            if no_cache:
+                params.append('no-cache')
+            if no_store:
+                params.append('no-store')
+            if must_revalidate:
+                params.append('must-revalidate')
+            if proxy_revalidate:
+                params.append('proxy-revalidate')
+
+            self.set_header('Cache-Control', ', '.join(params))
+            fn(self, *args, **kwargs)
+
+        return _func
     return wrapper
