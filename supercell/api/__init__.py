@@ -25,16 +25,16 @@ from supercell.api.service import Service
 
 
 __all__ = [
-        'async',
-        'cache',
-        'ContentType',
-        'MediaType',
-        'RequestHandler',
-        'provides',
-        'consumes',
-        'Return',
-        'Ok',
-        'OkCreated',
-        'Error',
-        'Service',
-    ]
+    'async',
+    'cache',
+    'ContentType',
+    'MediaType',
+    'RequestHandler',
+    'provides',
+    'consumes',
+    'Return',
+    'Ok',
+    'OkCreated',
+    'Error',
+    'Service',
+]
