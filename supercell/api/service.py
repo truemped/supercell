@@ -15,6 +15,11 @@
 # limitations under the License.
 #
 #
+'''A :class:`Service` is the main element of a `supercell` application. It will
+instanciate the :class:`supercell.api.Environment` and parse the configuration
+files as well as the command line. In the final step the
+:class:`tornado.web.Application` is created and bound to a socket.
+'''
 from __future__ import absolute_import, division, print_function, with_statement
 
 import logging.config
@@ -42,11 +47,23 @@ define('socketfd', default=None, help='Filedescriptor used from circus')
 
 
 class Service(object):
-    '''Main service implementation managing the `tornado.web.Application` and
-    taking care of configuration.'''
+    '''Main service implementation managing the
+    :class:`tornado.web.Application` and taking care of configuration.'''
 
     def main(self):
-        '''Main method starting a `supercell` process.'''
+        '''Main method starting a **supercell** process.
+
+        This will first instantiate the :class:`tornado.web.Application` and
+        then bind it to the socket. There are two possibilities to bind to a
+        socket: either by binding to a certain port and address as defined by
+        the configuration (the *port* and *address* configuration settings) or
+        by the *socketfd* command line parameter.
+
+        The latter is mainly used in combination with Circus
+        (http://circus.readthedocs.org/). There you would bind the socket from
+        circus and start the worker processes by binding to the file
+        descriptor.
+        '''
         app = self.get_app()
 
         server = HTTPServer(app)
@@ -64,17 +81,27 @@ class Service(object):
         IOLoop.instance().start()
 
     def get_app(self):
-        '''Create the `tornado.web.Appliaction` instance and return it.'''
+        '''Create the :class:`tornado.web.Appliaction` instance and return it.
+
+        In this method the :func:`Service.bootstrap()` is called, then
+        :func:`Service.run()` will initialize the app.'''
+
+        # initialize the environment
+        self.environment
+
         # bootstrap the service
         self.bootstrap()
 
-        # add handlers, health checks and others to the environment
+        # perform all the configuration parsing
+        self.config
+
+        # add handlers, health checks, managed objects to the environment
         self.run()
 
-        # do not allow any changes on managed objects anymore.
-        self.environment.finalize_managed_objects()
+        # do not allow any changes on the environment anymore.
+        self.environment._finalize()
 
-        return self.environment.application(self.config)
+        return self.environment._application(self.config)
 
     @property
     def slog(self):
@@ -93,7 +120,8 @@ class Service(object):
     @property
     def config(self):
         '''Assemble the configration files and command line arguments in order
-        to finalize the service's configuration.'''
+        to finalize the service's configuration. All configuration values
+        can be overwritten by the command line.'''
         if not hasattr(self, '_config'):
             # parse config files and command line arguments
             self.parse_config_files()
@@ -104,7 +132,19 @@ class Service(object):
 
     def parse_config_files(self):
         '''Parse the config files and return the `config` object, i.e. the
-        `tornado.options.options` instance.'''
+        `tornado.options.options` instance. For each entry in the
+        `Environment.config_file_paths()` it will check for a general
+        *config.py* and then for a file named as defined by
+        `Environment.config_name`.
+
+        So if the config file paths are set to `['/etc/myservice',
+        './etc/']` the following files are parsed::
+
+            /etc/myservice/config.cfg
+            /etc/myservice/user_hostname.cfg
+            ./etc/config.cfg
+            ./etc/user_hostname.cfg
+        '''
         filename = self.environment.config_name
         for path in self.environment.config_file_paths:
             cfg = os.path.join(path, 'config.cfg')
@@ -129,10 +169,11 @@ class Service(object):
         return slog
 
     def bootstrap(self):
-        '''Overide to change the environment.'''
+        '''Implement this method in order to manipulate the configuration
+        paths, e.g..'''
         pass
 
     def run(self):
-        '''Start the process and add the handlers and health checks to the
-        environment.'''
+        '''Implement this method in order to add handlers and managed objects
+        to the environment, before the app is started.'''
         pass

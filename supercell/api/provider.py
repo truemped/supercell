@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 #
-'''Base mechanics for content type providers and a default provider for the
-JSON (`application/json`) content type.
-'''
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import defaultdict
@@ -58,10 +55,24 @@ class ProviderMeta(type):
 
 
 class ProviderBase(with_metaclass(ProviderMeta, object)):
-    '''Base class for content type providers.'''
+    '''Base class for content type providers.
+
+    Creating a new provider is just as simple as creating new consumers::
+
+        class MyProvider(s.ProviderBase):
+
+            CONTENT_TYPE = s.ContentType('application/xml')
+
+            def provide(self, model, handler):
+                self.set_header('Content-Type', 'application/xml')
+                handler.write(model.to_xml())
+    '''
 
     CONTENT_TYPE = None
-    '''The target content type for the provider.'''
+    '''The target content type for the provider.
+
+    :type: `supercell.api.ContentType`
+    '''
 
     @staticmethod
     def map_provider(accept_header, handler, allow_default=False):
@@ -72,6 +83,7 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
         :param accept_header: HTTP Accept header value
         :type accept_header: str
         :param handler: supercell request handler
+        :raises: :exc:`NoProviderFound`
         '''
         if not hasattr(handler, '_PROD_CONTENT_TYPES'):
             raise NoProviderFound()

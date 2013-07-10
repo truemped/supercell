@@ -36,13 +36,12 @@ _DEFAULT_CONTENT_TYPE = 'DEFAULT'
 
 class RequestHandler(rq):
     '''
-    Supercell request handler.
-    '''
+    **supercell** request handler.
 
-    def __init__(self, *args, **kwargs):
-        '''Initialize the request and map the instance methods to the HTTP
-        verbs.'''
-        super(RequestHandler, self).__init__(*args, **kwargs)
+    The only difference to the :class:`tornado.web.RequestHandler` is an
+    adopted :func:`RequestHandler._execute_method()` method that will handle
+    the consuming and providing of request inputs and results.
+    '''
 
     @property
     def environment(self):

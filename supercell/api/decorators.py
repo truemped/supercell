@@ -15,12 +15,8 @@
 # limitations under the License.
 #
 #
-'''Several decorators for using with `supercell.api.RequestHandler`
+'''Several decorators for using with :class:`supercell.api.RequestHandler`
 implementations.
-
-The decorators for mapping HTTP verbs to instance methods automatically add the
-`tornado.web.asynchronous` and `tornado.gen.coroutine` decorators to the method,
-so you don't have to.
 '''
 from __future__ import absolute_import, division, print_function, with_statement
 
@@ -34,17 +30,17 @@ from supercell.api import ContentType
 
 
 def async(fn):
-    '''Decorator that only merges the `tornado.web.asynchronous` as well as the
-    `tornado.gen.coroutine` decorators.
+    '''Decorator that merges the :func:`tornado.web.asynchronous` as well as
+    the :func:`tornado.gen.coroutine` decorators.
 
     Example::
 
-        class MyHandler(RequestHandler):
+        class MyHandler(s.RequestHandler):
 
-            @async
+            @s.async
             def get(self, user_id):
                 # ...
-                yield User()
+                raise s.Return(User())
     '''
     return asynchronous(gen.coroutine(fn))
 
@@ -56,18 +52,26 @@ def provides(content_type, vendor=None, version=None, default=False):
     In order to allow the **application/json** content type, create the handler
     class like this::
 
-        @provides(MediaType.ApplicationJson)
-        class MyHandler(RequestHandler):
+        @s.provides(sMediaType.ApplicationJson)
+        class MyHandler(sRequestHandler):
             pass
 
     It is also possible to support more than one content type. The content type
-    selection is then based on the client `Accept` header. If this is not
-    present, ordering of the `provides` decorators matter, i.e. the first
+    selection is then based on the client **Accept** header. If this is not
+    present, ordering of the :func:`provides` decorators matter, i.e. the first
     content type is used::
 
-        @provides(MediaType.ApplicationJson, model=MyModel)
-        class MyHandler(RequestHandler):
-            pass
+        @s.provides(s.MediaType.ApplicationJson, model=MyModel)
+        class MyHandler(s.RequestHandler):
+            ...
+
+    :param str content_type: The base content type such as **application/json**
+    :param model: The model that should be consumed.
+    :type model: :class:`schematics.models.Model`
+    :param str vendor: Any vendor information for the base content type
+    :param float version: The vendor version
+    :param bool default: If **True** and no **Accept** header is present, this
+                         content type is provided
     '''
 
     def wrapper(cls):
@@ -96,13 +100,18 @@ def consumes(content_type, model, vendor=None, version=None):
 
     Example::
 
-        @consumes(MediaType.ApplicationJson, model=Model)
-        class MyHandler(RequestHandler):
+        @s.consumes(s.MediaType.ApplicationJson, model=Model)
+        class MyHandler(s.RequestHandler):
 
-            @post
-            def do_something_with_json(self, *args, **kwargs):
+            def post(self, *args, **kwargs):
                 # ...
-                raise Ok()
+                raise s.OkCreated()
+
+    :param str content_type: The base content type such as **application/json**
+    :param model: The model that should be consumed.
+    :type model: :class:`schematics.models.Model`
+    :param str vendor: Any vendor information for the base content type
+    :param float version: The vendor version
     '''
 
     def wrapper(cls):

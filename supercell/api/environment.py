@@ -15,9 +15,24 @@
 # limitations under the License.
 #
 #
+'''The :class:`Environment` is a container for request handlers, managed
+objects and other runtime settings as well as the
+:class:`tornado.web.Application` settings.
+
+There are two cases where you will need to work with the it: during the
+bootstrapping phase you may change paths to look for configuration files and
+you will add the request handlers to the environment.  In addition to that you
+can also use it from within a request handler in and access managed objects,
+such as HTTP clients that can be used accross a number of client libraries for
+connection pooling, e.g.
+'''
+
 from collections import namedtuple
 
 from tornado.web import Application as _TAPP
+
+
+__all__ = ['Environment']
 
 
 Handler = namedtuple('Handler', ['host_pattern', 'path', 'handler_class',
@@ -25,7 +40,7 @@ Handler = namedtuple('Handler', ['host_pattern', 'path', 'handler_class',
 
 
 class Application(_TAPP):
-    '''Overwrite `tornado.web.Application` in order to give access to
+    '''Overwrite :class:`tornado.web.Application` in order to give access to
     environment and configuration instances.'''
 
     def __init__(self, environment, config, **kwargs):
@@ -38,17 +53,49 @@ class Application(_TAPP):
 
 
 class Environment(object):
-    '''Base environment for `supercell` processes.'''
+    '''Environment for **supercell** processes.
+    '''
 
     def __init__(self):
-        '''Initialize the handlers and health checks.'''
+        '''Initialize the handlers and health checks variables.'''
         self._handlers = []
         self._managed_objects = {}
-        self._no_more_managed_objects = False
+        self._finalized = False
 
     def add_handler(self, path, handler_class, init_dict, name=None,
             host_pattern='.*$'):
-        '''Add a handler to the tornado application.'''
+        '''Add a handler to the :class:`tornado.web.Application`.
+
+        The environment will manage the available request handlers and managed
+        objects. So in the :py:func:`Service.run()` method you will add the
+        handlers::
+
+            class MyService(s.Service):
+
+                def run():
+                    self.environment.add_handler('/', Handler, {})
+
+        :param path: The regular expression for the URL path the handler should
+                     be bound to.
+        :type path: str or re.pattern
+
+        :param handler_class: The request handler class
+        :type handler_class: supercell.api.RequestHandler
+
+        :param init_dict: The initialization dict that is passed to the
+                          `RequestHandler.initialize()` method.
+        :type init_dict: dict
+
+        :param name: If set the handler and its URL will be available in the
+                     `RequestHandler.reverse_url()` method.
+        :type name: str
+
+        :param host_pattern: A regular expression for matching the hostname the
+                             handler will be bound to. By default this will
+                             match all hosts ('.*$')
+        :type host_pattern: str
+        '''
+        assert not self._finalized, 'Do not change the environment at runtime'
         handler = Handler(host_pattern=host_pattern, path=path,
                           handler_class=handler_class, init_dict=init_dict,
                           name=name)
@@ -57,21 +104,38 @@ class Environment(object):
     def add_managed_object(self, name, instance):
         '''Add a managed instance to the environment.
 
-        You can access it later on from the environment as an attribute, so
-        in your request handler you may::
+        A managed object is identified by a name and you can then access it
+        from the environment as an attribute, so in your request handler you
+        may::
+
+            class MyService(s.Service):
+
+                def run(self):
+                    managed = HeavyObjectFactory.get_heavy_object()
+                    self.environment.add_managed_object('managed', managed)
 
             class MyHandler(s.RequestHandler):
 
                 def get(self):
                     self.environment.managed
+
+        :param name: The managed object identifier
+        :type name: str
+
+        :param instance: Some arbitrary instance
+        :type instance: object
         '''
+        assert not self._finalized
         assert name not in self._managed_objects
-        assert not self._no_more_managed_objects
         self._managed_objects[name] = instance
 
-    def finalize_managed_objects(self):
-        '''When called it is not possible to add more managed objects.'''
-        self._no_more_managed_objects = True
+    def _finalize(self):
+        '''When called it is not possible to add more managed objects.
+
+        When the `Service.main()` method starts, it will call `_finalize()`
+        in order to not be able to change the environment with respect to
+        managed objects and request handlers.'''
+        self._finalized = True
 
     def __getattr__(self, name):
         '''Retrieve a managed object from `self._managed_objects`.'''
@@ -85,36 +149,55 @@ class Environment(object):
 
     @property
     def config_file_paths(self):
-        '''The list containing all paths to look for config files.'''
+        '''The list containing all paths to look for config files.
+
+        In order to manipulate the paths looked for configuration files just
+        manipulate this list::
+
+            class MyService(s.Service):
+
+                def bootstrap(self):
+                    self.environment.config_file_paths.append('/etc/myservice/')
+                    self.environment.config_file_paths.append('./etc/')
+        '''
         if not hasattr(self, '_config_file_paths'):
             self._config_file_paths = []
         return self._config_file_paths
 
     @property
     def tornado_settings(self):
-        '''The dictionary passed to the `tornado.web.Application` containing
-        all relevant tornado server settings.'''
+        '''The dictionary passed to the :class:`tornado.web.Application`
+        containing all relevant tornado server settings.'''
         if not hasattr(self, '_tornado_settings'):
             self._tornado_settings = {}
         return self._tornado_settings
 
-    def application(self, config):
-        '''Create the tornado application and return it.'''
-        if not hasattr(self, '_application'):
-            self._application = Application(self, config,
-                                            **self.tornado_settings)
+    def _application(self, config):
+        '''Create the tornado application.
+
+        :param config: The configuration that will be added to the app
+        '''
+        if not hasattr(self, '_app'):
+            self._app = Application(self, config,
+                                    **self.tornado_settings)
 
         for handler in self._handlers:
-            self._application.add_handlers(handler.host_pattern,
+            self._app.add_handlers(handler.host_pattern,
                                            [(handler.path,
                                             handler.handler_class,
                                             handler.init_dict)])
-        return self._application
+        return self._app
 
     @property
     def config_name(self):
         '''Determine the configuration file name for the machine this
-        application is running on.'''
+        application is running on.
+
+        The filenames are generated using a combination of username and
+        machine name. If you deploy the application as user **webapp** on host
+        **fe01.local.dev** the configuration name would be
+        **webapp_fe01.local.dev.cfg**.
+        '''
         if not hasattr(self, '_config_name'):
             import getpass
             import socket
@@ -123,7 +206,11 @@ class Environment(object):
         return self._config_name
 
     def tornado_log_function(self, logger):
-        '''Return a function that will log tornado requests.'''
+        '''Return a function that will log tornado requests.
+
+        :param logger: the logger that will be used for logging the requests
+        :type logger: logging.logger
+        '''
         if not hasattr(self, '_log_function'):
 
             def req_log(handler):

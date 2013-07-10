@@ -29,13 +29,13 @@ __all__ = ['NoConsumerFound', 'ConsumerBase', 'JsonConsumer']
 
 
 class NoConsumerFound(Exception):
-    '''Raised if no matching consumer for the client's `Content-Type` header was
-    found.'''
+    '''Raised if no matching consumer for the client's `Content-Type` header
+    was found.'''
     pass
 
 
 class ConsumerMeta(type):
-    '''Meta class for all content type providers.
+    '''Meta class for all consumers.
 
     This will simply register a consumer with the respective content type
     information and make them available in a list of content types and their
@@ -56,10 +56,27 @@ class ConsumerMeta(type):
 
 
 class ConsumerBase(with_metaclass(ConsumerMeta, object)):
-    '''Base class for content type providers.'''
+    '''Base class for content type consumers.
+
+    In order to create a new consumer, you must create a new class that
+    inherits from :py:class:`ConsumerBase` and sets the
+    :data:`ConsumerBase.CONTENT_TYPE` variable::
+
+        class MyConsumer(s.ConsumerBase):
+
+            CONTENT_TYPE = s.ContentType('application/xml')
+
+            def consume(self, handler, model):
+                return model(lxml.from_string(handler.request.body))
+
+    .. seealso:: :py:mod:`supercell.api.consumer.JsonConsumer.consume`
+    '''
 
     CONTENT_TYPE = None
-    '''The target content type for the provider.'''
+    '''The target content type for the consumer.
+
+    :type: `supercell.api.ContentType`
+    '''
 
     @staticmethod
     def map_consumer(content_type, handler):
@@ -70,6 +87,8 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
         :param accept_header: HTTP Accept header value
         :type accept_header: str
         :param handler: supercell request handler
+
+        :raises: :exc:`NoConsumerFound`
         '''
         accept = parse_accept_header(content_type)
         if len(accept) == 0:
@@ -94,22 +113,24 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
         raise NoConsumerFound()
 
     def consume(self, handler, model):
-        '''This method should return the correct representation as a simple
-        string (i.e. byte buffer) that will be used as return value.
+        '''This method should return the correct representation as a parsed
+        model.
 
         :param model: the model to convert to a certain content type
-        :type model: supercell.schematics.Model
+        :type model: :class:`schematics.models.Model`
         '''
         raise NotImplemented()
 
 
 class JsonConsumer(ConsumerBase):
-    '''Default `application/json` provider.'''
+    '''Default **application/json** provider.'''
 
     CONTENT_TYPE = ContentType(MediaType.ApplicationJson)
+    '''The **application/json** :class:`ContentType`.'''
 
     def consume(self, handler, model):
-        '''Simply return the json via `json.dumps`.
+        '''Parse the body json via :func:`json.loads` and initialize the
+        `model`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         '''
