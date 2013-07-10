@@ -26,9 +26,9 @@ PY2 = sys.version_info[0] == 2
 
 
 tests_require = [
-    'tornado-pyvows>=0.5.0',
-    'mock==1.0.1',
-    ]
+'tornado-pyvows>=0.5.0',
+'mock==1.0.1',
+]
 
 if sys.version_info < (2, 7):
     tests_require.append('unittest2')
@@ -43,26 +43,26 @@ if PY2:
 
 
 setup (
-    name = 'supercell',
-    version = '.'.join([str(v) for v in init.__version__]),
+    name='supercell',
+    version='.'.join([str(v) for v in init.__version__]),
 
-    author = 'Daniel Truemper',
-    author_email = 'truemped@gmail.com',
-    url = 'http://truemped.github.com/supercell',
+    author='Daniel Truemper',
+    author_email='truemped@gmail.com',
+    url='http://truemped.github.com/supercell',
     license="http://www.apache.org/licenses/LICENSE-2.0",
 
-    description = '',
-    packages = ['supercell', 'supercell.api', 'supercell.utils'],
+    description='',
+    packages=['supercell', 'supercell.api', 'supercell.utils'],
 
-    install_requires = [
+    install_requires=[
         'tornado >= 3.1.0',
         'schematics == 0.6.0',
         'scales == 1.0.3',
     ],
 
-    tests_require = tests_require,
-    extras_require = extras_require,
-    classifiers = [
+    tests_require=tests_require,
+    extras_require=extras_require,
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
