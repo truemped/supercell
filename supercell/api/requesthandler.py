@@ -19,9 +19,10 @@ from __future__ import absolute_import, division, print_function, with_statement
 from functools import partial
 import json
 
+from schematics.models import Model
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.api import Ok, MediaType
+from supercell.api import MediaType
 from supercell.api.metatypes import ReturnInformationT
 from supercell.api.consumer import ConsumerBase, NoConsumerFound
 from supercell.api.provider import ProviderBase, NoProviderFound
@@ -98,8 +99,7 @@ class RequestHandler(rq):
                 raise HTTPError(406)
 
             provider = provider_class()
-            if future_model.result():
+            if isinstance(result, Model):
                 provider.provide(future_model.result(), self)
-            else:
-                provider.provide(Ok, self)
+
         self.finish()

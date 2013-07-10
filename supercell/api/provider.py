@@ -21,7 +21,6 @@ JSON (`application/json`) content type.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import defaultdict
-import json
 
 from supercell._compat import with_metaclass
 from supercell.api import ContentType, MediaType
