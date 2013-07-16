@@ -1,7 +1,8 @@
-master
+0.2.5 - (July 16, 2013)
 -----------------------
 
 - Only call finish() if the handler did not
+- Minor fix for accessing the app in environments
 
 0.2.4 - (July 10, 2013)
 -----------------------
