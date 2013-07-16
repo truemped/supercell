@@ -26,6 +26,7 @@ can also use it from within a request handler in and access managed objects,
 such as HTTP clients that can be used accross a number of client libraries for
 connection pooling, e.g.
 '''
+from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import namedtuple
 
@@ -181,11 +182,11 @@ class Environment(object):
             self._app = Application(self, config,
                                     **self.tornado_settings)
 
-        for handler in self._handlers:
-            self._app.add_handlers(handler.host_pattern,
-                                           [(handler.path,
-                                            handler.handler_class,
-                                            handler.init_dict)])
+            for handler in self._handlers:
+                self._app.add_handlers(handler.host_pattern,
+                                            [(handler.path,
+                                                handler.handler_class,
+                                                handler.init_dict)])
         return self._app
 
     @property
