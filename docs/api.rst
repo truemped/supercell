@@ -44,3 +44,10 @@ Decorators
 
 .. automodule:: supercell.api.decorators
     :members:
+
+
+Health Checks
+-------------
+
+.. automodule:: supercell.api.healthchecks
+    :members:

@@ -22,6 +22,8 @@ from supercell.api.metatypes import (ContentType, MediaType, Return, Ok,
 from supercell.api.requesthandler import RequestHandler
 from supercell.api.decorators import provides, consumes, async, cache
 from supercell.api.service import Service
+from supercell.api.healthchecks import (HealthCheckOk, HealthCheckWarning,
+                                        HealthCheckError)
 
 
 __all__ = [
@@ -37,4 +39,7 @@ __all__ = [
     'OkCreated',
     'Error',
     'Service',
+    'HealthCheckOk',
+    'HealthCheckWarning',
+    'HealthCheckError',
 ]

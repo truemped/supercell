@@ -61,6 +61,7 @@ class Environment(object):
         '''Initialize the handlers and health checks variables.'''
         self._handlers = []
         self._managed_objects = {}
+        self._health_checks = {}
         self._finalized = False
 
     def add_handler(self, path, handler_class, init_dict, name=None,
@@ -144,9 +145,23 @@ class Environment(object):
             raise AttributeError('%s not a managed object' % name)
         return self._managed_objects[name]
 
-    def add_health_check(self):
-        # TODO
-        pass
+    def add_health_check(self, name, check):
+        '''Add a health check to the API.
+
+        :param name: The name for the health check to add
+        :type name: str
+
+        :param check: The request handler performing the health check
+        :type check: A :class:`supercell.api.RequestHandler`
+        '''
+        assert not self._finalized
+        assert name not in self._health_checks
+        self._health_checks[name] = check
+
+    @property
+    def health_checks(self):
+        '''Simple property access for health checks.'''
+        return self._health_checks
 
     @property
     def config_file_paths(self):

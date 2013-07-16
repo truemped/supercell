@@ -31,6 +31,7 @@ from tornado.ioloop import IOLoop
 from tornado.options import define
 
 from supercell.api.environment import Environment
+from supercell.api.healthchecks import SystemHealthCheck
 
 
 define('logconf', default='logging.cfg',
@@ -97,6 +98,13 @@ class Service(object):
 
         # add handlers, health checks, managed objects to the environment
         self.run()
+
+        self.environment.add_handler('/_system', SystemHealthCheck, {})
+
+        for check_name in self.environment.health_checks:
+            check = self.environment.health_checks[check_name]
+            self.environment.add_handler('/_system/%s' % check,
+                                         check, {})
 
         # do not allow any changes on the environment anymore.
         self.environment._finalize()

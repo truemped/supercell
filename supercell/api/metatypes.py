@@ -54,7 +54,8 @@ class Ok(Return):
     def __init__(self, code=200, additional=None):
         v = {'ok': True}
         if additional:
-            assert isinstance(additional, dict), 'Additional messages must be of type dict'
+            assert isinstance(additional, dict), 'Additional messages must ' +\
+                                                 'be of type dict'
             v.update(additional)
 
         super(Ok, self).__init__(ReturnInformation(code, message=v))
@@ -71,7 +72,8 @@ class Error(Return):
     def __init__(self, code=400, additional=None):
         v = {'error': True}
         if additional:
-            assert isinstance(additional, dict), 'Additional messages must be of type dict'
+            assert isinstance(additional, dict), 'Additional messages must ' +\
+                                                 'be of type dict'
             v.update(additional)
 
         super(Error, self).__init__(ReturnInformation(code, message=v))
