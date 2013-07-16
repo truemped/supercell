@@ -56,6 +56,21 @@ class TestBasicConsumer(TestCase):
             ConsumerBase.map_consumer('application/vnd.supercell-v1.1+json',
                                       handler=MyHandler)
 
+    def test_default_json_consumer_with_encoding_in_ctype(self):
+
+        @consumes(MediaType.ApplicationJson, object)
+        class MyHandler(RequestHandler):
+            pass
+
+        (_, consumer) = ConsumerBase.map_consumer(
+                'application/json; encoding=UTF-8', handler=MyHandler)
+
+        self.assertIs(consumer, JsonConsumer)
+
+        with self.assertRaises(NoConsumerFound):
+            ConsumerBase.map_consumer('application/vnd.supercell-v1.1+json',
+                                      handler=MyHandler)
+
     def test_specific_json_consumer(self):
 
         @consumes(MediaType.ApplicationJson, object, vendor='supercell')
