@@ -1,3 +1,9 @@
+0.3.0 - (July, 16, 2013)
+------------------------
+
+- Introduce health checks into supercell
+- Add a test for mapping ctypes with encodings
+
 0.2.5 - (July 16, 2013)
 -----------------------
 
