@@ -1,3 +1,8 @@
+master
+-----------------------
+
+- Only call finish() if the handler did not
+
 0.2.4 - (July 10, 2013)
 -----------------------
 

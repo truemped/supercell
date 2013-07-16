@@ -101,4 +101,5 @@ class RequestHandler(rq):
             if isinstance(result, Model):
                 provider.provide(future_model.result(), self)
 
-        self.finish()
+        if not self._finished:
+            self.finish()
