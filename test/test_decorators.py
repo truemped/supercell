@@ -30,6 +30,7 @@ from nose.tools import raises
 from schematics.models import Model
 from schematics.types import StringType
 
+from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
@@ -196,6 +197,26 @@ class MyPrivateCaching(RequestHandler):
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
+@provides(s.MediaType.ApplicationJson, default=True)
+class CachingWithYielding(RequestHandler):
+
+    @s.async
+    @s.cache(timedelta(seconds=10))
+    def get(self, *args, **kwargs):
+        result = yield self.a_coroutine()
+        assert result, 'yes'
+        result = yield gen.Task(self.an_engine)
+        assert result, 'yes again'
+        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+    @gen.coroutine
+    def a_coroutine(self):
+        raise s.Return('yes')
+
+    @gen.engine
+    def an_engine(self, callback=None):
+        callback('yes again')
+
 
 class TestCacheDecorator(AsyncHTTPTestCase):
 
@@ -207,6 +228,7 @@ class TestCacheDecorator(AsyncHTTPTestCase):
             (r'/', MyHandler),
             (r'/cache', MyExtremeCachingHandler),
             (r'/private', MyPrivateCaching),
+            (r'/nested_async', CachingWithYielding),
         ])
 
     def test_simple_timedelta(self):
@@ -229,4 +251,11 @@ class TestCacheDecorator(AsyncHTTPTestCase):
         self.assertEqual(response.code, 200)
         self.assertTrue('Cache-Control' in response.headers)
         self.assertEqual('max-age=10, private, no-store, must-revalidate',
+                         response.headers['Cache-Control'])
+
+    def test_caching_with_yielding(self):
+        response = self.fetch('/nested_async')
+        self.assertEqual(response.code, 200)
+        self.assertTrue('Cache-Control' in response.headers)
+        self.assertEqual('max-age=10, must-revalidate',
                          response.headers['Cache-Control'])
