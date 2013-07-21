@@ -22,7 +22,7 @@ files as well as the command line. In the final step the
 '''
 from __future__ import absolute_import, division, print_function, with_statement
 
-import logging.config
+import logging
 import os
 
 import tornado.options
@@ -32,10 +32,13 @@ from tornado.options import define
 
 from supercell.api.environment import Environment
 from supercell.api.healthchecks import SystemHealthCheck
+from supercell.api.logging import SupercellLoggingHandler
 
 
-define('logconf', default='logging.cfg',
-       help='Name of the logging configuration file')
+define('logfile', default='root.log', help='Filename to store the logs')
+
+
+define('loglevel', default='INFO', help='Log level')
 
 
 define('port', default=8080, help='Port to listen on')
@@ -115,7 +118,8 @@ class Service(object):
     def slog(self):
         '''Initialize the logging and return the logger.'''
         if not hasattr(self, '_slog'):
-            self._slog = self.initialize_logging()
+            self.initialize_logging()
+            self._slog = logging.getLogger('supercell')
         return self._slog
 
     @property
@@ -168,13 +172,20 @@ class Service(object):
         values.'''
         tornado.options.parse_command_line()
 
-    def initialize_logging(self, name='supercell'):
-        '''Initialize the python logging system.'''
-        logging.config.fileConfig(self.config.logconf)
-        slog = logging.getLogger(name)
-        ts = self.environment.tornado_settings
-        ts['log_function'] = self.environment.tornado_log_function(slog)
-        return slog
+    def initialize_logging(self):
+        '''Initialize the python logging system.
+
+        It is difficult to check whether the logging system is already
+        initialized, so we are currently only checking if a
+        :class:`TimedRotatingFileHandler` has already been added to the `root`
+        logger. This should only be necessary when running unittests though.'''
+        root = logging.getLogger()
+
+        hdlrs = [h for h in root.handlers
+                 if isinstance(h, SupercellLoggingHandler)]
+        if len(hdlrs) == 0:
+            root.setLevel(self.config.loglevel)
+            root.addHandler(SupercellLoggingHandler(self.config.logfile))
 
     def bootstrap(self):
         '''Implement this method in order to manipulate the configuration

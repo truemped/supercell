@@ -29,6 +29,7 @@ connection pooling, e.g.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import namedtuple
+import logging
 
 from tornado.web import Application as _TAPP
 
@@ -221,25 +222,7 @@ class Environment(object):
                                                socket.gethostname())
         return self._config_name
 
-    def tornado_log_function(self, logger):
-        '''Return a function that will log tornado requests.
-
-        :param logger: the logger that will be used for logging the requests
-        :type logger: logging.logger
-        '''
-        if not hasattr(self, '_log_function'):
-
-            def req_log(handler):
-                if handler.get_status() < 400:
-                    log_method = logger.info
-                elif handler.get_status() < 500:
-                    log_method = logger.warning
-                else:
-                    log_method = logger.error
-
-                request_time = 1000.0 * handler.request.request_time()
-                log_method("%d %s %.2fms", handler.get_status(),
-                        handler._request_summary(), request_time)
-            self._log_function = req_log
-
-        return self._log_function
+    def get_logger(self, name):
+        '''Get a logger with the given name.'''
+        logger = logging.getLogger(name)
+        return logger

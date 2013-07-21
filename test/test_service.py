@@ -44,13 +44,26 @@ class MyHandler(s.RequestHandler):
 
     @s.async
     def get(self):
+        self.logger.info('Holy moly')
+        self.logger.info('That worked')
         raise s.Return(SimpleModel(msg='Holy moly'))
 
     @s.async
     def post(self, doc_id, model=None):
+        self.logger.info('Holy moly')
+        raise s.Return(SimpleModel(msg='Holy moly'))
         assert isinstance(self.environment, Environment)
         assert isinstance(self.config, tornado.options.options)
         raise s.OkCreated({'docid': 123})
+
+
+@s.provides(s.MediaType.ApplicationJson, default=True)
+class MyHandlerThrowingExceptions(s.RequestHandler):
+
+    @s.async
+    def get(self):
+        self.logger.info('Starting request with unhandled exception')
+        raise Exception()
 
 
 class MyService(s.Service):
@@ -61,6 +74,8 @@ class MyService(s.Service):
     def run(self):
         self.environment.add_handler('/test', MyHandler, {})
         self.environment.add_handler('/test/(\d+)', MyHandler, {})
+        self.environment.add_handler('/exception', MyHandlerThrowingExceptions,
+                                     {})
 
 
 class ServiceTest(TestCase):
@@ -102,9 +117,14 @@ class ApplicationIntegrationTest(AsyncHTTPTestCase):
 
     def get_app(self):
         service = MyService()
+        service.initialize_logging()
         return service.get_app()
 
     def test_simple_get(self):
         response = self.fetch('/test', headers={'Accept': s.MediaType.ApplicationJson})
         self.assertEqual(200, response.code)
         self.assertEqual('{"msg": "Holy moly"}', response.body)
+
+    def test_get_with_exception(self):
+        response = self.fetch('/exception')
+        self.assertEqual(500, response.code)

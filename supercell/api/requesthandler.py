@@ -18,6 +18,7 @@
 from __future__ import absolute_import, division, print_function, with_statement
 from functools import partial
 import json
+import time
 
 from schematics.models import Model
 from tornado.web import RequestHandler as rq, HTTPError
@@ -53,6 +54,37 @@ class RequestHandler(rq):
         '''Convinience method for accessing the environment.'''
         return self.application.config
 
+    @property
+    def logger(self):
+        '''Use this property to write to the log files.
+
+        In a request handler you would simply log messages like this::
+
+            def get(self):
+                self.logger.info('A test')
+        '''
+        if not hasattr(self, '_logger'):
+            name = '%s:%s' % (self.__class__.__name__, self.request_id)
+            self._logger = self.environment.get_logger(name)
+        return self._logger
+
+    @property
+    def request_id(self):
+        '''Return a unique id per request. Collisions are allowed but should
+        should not occur within a 10 minutes time window.
+
+        The current implementation is based on a timestamp in milliseconds
+        substracted by a large number to make the id smaller.
+        '''
+        if not hasattr(self, '_request_id'):
+            self._request_id = int(time.time() * 1000) - 1374400000000
+        return self._request_id
+
+    def _request_summary(self):
+        return self.request.method + " " + self.request.uri + \
+            " (ip:" + self.request.remote_ip + ", r_id:" + \
+            str(self.request_id) + ")"
+
     def _execute_method(self):
         '''Execute the request.
 
@@ -76,7 +108,6 @@ class RequestHandler(rq):
                     raise HTTPError(406)
 
             future_model = method(*self.path_args, **kwargs)
-
             callback = partial(self._provide_result, verb, headers)
             future_model.add_done_callback(callback)
 
