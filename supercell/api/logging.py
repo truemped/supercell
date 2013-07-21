@@ -27,9 +27,8 @@ class SupercellLoggingHandler(TimedRotatingFileHandler):
 
     def __init__(self, logfile):
         '''Initialize the :class:`TimedRotatingFileHandler`.'''
-        super(SupercellLoggingHandler, self).__init__(logfile, when='d',
-                                                      interval=1,
-                                                      backupCount=10)
+        TimedRotatingFileHandler.__init__(self, logfile, when='d',
+                                          interval=1, backupCount=10)
         formatter = Formatter(' - '.join(['[%(asctime)s',
                                         '%(relativeCreated).3f]',
                                         '%(name)s',
