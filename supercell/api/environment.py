@@ -45,13 +45,13 @@ class Application(_TAPP):
     '''Overwrite :class:`tornado.web.Application` in order to give access to
     environment and configuration instances.'''
 
-    def __init__(self, environment, config, **kwargs):
+    def __init__(self, environment, config, *args, **kwargs):
         '''Initialize the tornado Application and add the config and
         environment.
         '''
         self.environment = environment
         self.config = config
-        super(Application, self).__init__(**kwargs)
+        super(Application, self).__init__(*args, **kwargs)
 
 
 class Environment(object):
