@@ -37,7 +37,7 @@ from tornado.testing import AsyncHTTPTestCase
 import supercell.api as s
 from supercell.api import (RequestHandler, provides, consumes, MediaType,
                            CacheConfig)
-from supercell.api.environment import Application, Environment
+from supercell.api.environment import Environment
 
 
 class TestConsumesDecorator(TestCase):
@@ -277,3 +277,5 @@ class TestCacheDecorator(AsyncHTTPTestCase):
         self.assertTrue('Cache-Control' in response.headers)
         self.assertEqual('max-age=10, must-revalidate',
                          response.headers['Cache-Control'])
+        self.assertEqual('{"message": "A test", "doc_id": "test123"}',
+                         response.body)
