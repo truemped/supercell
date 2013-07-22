@@ -22,10 +22,10 @@ from schematics.types import StringType
 
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
 
 import supercell.api as s
 from supercell.api import (RequestHandler, provides, consumes)
+from supercell.api.environment import Environment
 
 
 class SimpleMessage(Model):
@@ -68,12 +68,11 @@ class MyEchoHandler(RequestHandler):
 class TestSimpleRequestHandler(AsyncHTTPTestCase):
 
     def get_app(self):
-        app = Application([
-            ('/test', MyHandler),
-            ('/test_default', MyHandlerWithDefault),
-            ('/test_post', MyEchoHandler),
-        ])
-        return app
+        env = Environment()
+        env.add_handler('/test', MyHandler)
+        env.add_handler('/test_default', MyHandlerWithDefault)
+        env.add_handler('/test_post', MyEchoHandler)
+        return env.get_application()
 
     def get_new_ioloop(self):
         return IOLoop.instance()

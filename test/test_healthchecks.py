@@ -19,13 +19,10 @@ from __future__ import absolute_import, division, print_function, with_statement
 
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
-
-from mock import patch
 
 from supercell.api.healthchecks import SystemHealthCheck
 import supercell.api as s
-from supercell.api.environment import Application as Sapp
+from supercell.api.environment import Environment
 
 
 class TestBasicHealthChecks(AsyncHTTPTestCase):
@@ -34,8 +31,9 @@ class TestBasicHealthChecks(AsyncHTTPTestCase):
         return IOLoop.instance()
 
     def get_app(self):
-        return Application([('/_system', SystemHealthCheck),
-        ])
+        env = Environment()
+        env.add_handler('/_system', SystemHealthCheck)
+        return env.get_application()
 
     def test_simple_check(self):
         response = self.fetch('/_system')
@@ -64,10 +62,10 @@ class TestCustomHealthCheck(AsyncHTTPTestCase):
         return IOLoop.instance()
 
     def get_app(self):
-        return Application([
-            ('/_system/test', SimpleHealthCheckExample),
-            ('/_system/error', SimpleErrorCheckExample),
-        ])
+        env = Environment()
+        env.add_handler('/_system/test', SimpleHealthCheckExample)
+        env.add_handler('/_system/error', SimpleErrorCheckExample)
+        return env.get_application()
 
     def test_simple_warning(self):
         response = self.fetch('/_system/test')

@@ -33,10 +33,11 @@ from schematics.types import StringType
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
 
 import supercell.api as s
-from supercell.api import (RequestHandler, provides, consumes, MediaType)
+from supercell.api import (RequestHandler, provides, consumes, MediaType,
+                           CacheConfig)
+from supercell.api.environment import Application, Environment
 
 
 class TestConsumesDecorator(TestCase):
@@ -218,21 +219,38 @@ class CachingWithYielding(RequestHandler):
         callback('yes again')
 
 
+@provides(s.MediaType.ApplicationJson, default=True)
+class CachingWithoutDecorator(RequestHandler):
+
+    @s.async
+    def get(self, *args, **kwargs):
+        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+
 class TestCacheDecorator(AsyncHTTPTestCase):
 
     def get_new_ioloop(self):
         return IOLoop.instance()
 
     def get_app(self):
-        return Application([
-            (r'/', MyHandler),
-            (r'/cache', MyExtremeCachingHandler),
-            (r'/private', MyPrivateCaching),
-            (r'/nested_async', CachingWithYielding),
-        ])
+        env = Environment()
+        env.add_handler(r'/', MyHandler)
+        env.add_handler(r'/cache', MyExtremeCachingHandler)
+        env.add_handler(r'/private', MyPrivateCaching)
+        env.add_handler(r'/nested_async', CachingWithYielding)
+        env.add_handler(r'/without_decorator', CachingWithoutDecorator,
+                        cache=CacheConfig(timedelta(minutes=10)))
+        return env.get_application({})
 
     def test_simple_timedelta(self):
         response = self.fetch('/')
+        self.assertEqual(response.code, 200)
+        self.assertTrue('Cache-Control' in response.headers)
+        self.assertEqual('max-age=600, must-revalidate',
+                         response.headers['Cache-Control'])
+
+    def test_simple_timedelta_without_decorator(self):
+        response = self.fetch('/without_decorator')
         self.assertEqual(response.code, 200)
         self.assertTrue('Cache-Control' in response.headers)
         self.assertEqual('max-age=600, must-revalidate',

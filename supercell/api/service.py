@@ -112,7 +112,7 @@ class Service(object):
         # do not allow any changes on the environment anymore.
         self.environment._finalize()
 
-        return self.environment._application(self.config)
+        return self.environment.get_application(self.config)
 
     @property
     def slog(self):

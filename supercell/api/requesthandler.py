@@ -25,6 +25,7 @@ from schematics.models import Model
 from tornado.web import RequestHandler as rq, HTTPError
 
 from supercell.api import MediaType
+from supercell.api.cache import compute_cache_header
 from supercell.api.metatypes import ReturnInformationT
 from supercell.api.consumer import ConsumerBase, NoConsumerFound
 from supercell.api.provider import ProviderBase, NoProviderFound
@@ -107,6 +108,13 @@ class RequestHandler(rq):
                 except NoConsumerFound:
                     # TODO return available consumer types?!
                     raise HTTPError(406)
+
+            if verb in ['get', 'head']:
+                # check if there is caching information stored with the handler
+                cache_config = self.environment.get_cache_info(self.__class__)
+                if cache_config:
+                    self.set_header('Cache-Control',
+                                    compute_cache_header(cache_config))
 
             future_model = method(*self.path_args, **kwargs)
             callback = partial(self._provide_result, verb, headers)

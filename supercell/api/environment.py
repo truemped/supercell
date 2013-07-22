@@ -37,7 +37,7 @@ __all__ = ['Environment']
 
 
 Handler = namedtuple('Handler', ['host_pattern', 'path', 'handler_class',
-                                 'init_dict', 'name'])
+                                 'init_dict', 'name', 'cache'])
 
 
 class Application(_TAPP):
@@ -60,12 +60,13 @@ class Environment(object):
     def __init__(self):
         '''Initialize the handlers and health checks variables.'''
         self._handlers = []
+        self._cache_infos = {}
         self._managed_objects = {}
         self._health_checks = {}
         self._finalized = False
 
     def add_handler(self, path, handler_class, init_dict=None, name=None,
-            host_pattern='.*$'):
+            host_pattern='.*$', cache=None):
         '''Add a handler to the :class:`tornado.web.Application`.
 
         The environment will manage the available request handlers and managed
@@ -96,12 +97,17 @@ class Environment(object):
                              handler will be bound to. By default this will
                              match all hosts ('.*$')
         :type host_pattern: str
+
+        :param cache: Cache info for GET and HEAD requests to this handler
+                      defined by :class:`supercell.api.cache.CacheConfig`.
+        :type cache: supercell.api.cache.CacheConfigT
         '''
         assert not self._finalized, 'Do not change the environment at runtime'
         handler = Handler(host_pattern=host_pattern, path=path,
                           handler_class=handler_class, init_dict=init_dict,
-                          name=name)
+                          name=name, cache=cache)
         self._handlers.append(handler)
+        self._cache_infos[handler_class] = cache
 
     def add_managed_object(self, name, instance):
         '''Add a managed instance to the environment.
@@ -188,7 +194,7 @@ class Environment(object):
             self._tornado_settings = {}
         return self._tornado_settings
 
-    def _application(self, config):
+    def get_application(self, config=None):
         '''Create the tornado application.
 
         :param config: The configuration that will be added to the app
@@ -207,6 +213,13 @@ class Environment(object):
                 self._app.add_handlers(handler.host_pattern, [spec])
 
         return self._app
+
+    def get_cache_info(self, handler):
+        '''Return the :class:`supercell.api.cache.CacheConfig` for a certain
+        handler.'''
+        if handler not in self._cache_infos:
+            return None
+        return self._cache_infos[handler]
 
     @property
     def config_name(self):

@@ -32,7 +32,7 @@ class EnvironmentTest(TestCase):
 
     def test_simple_app_creation(self):
         env = Environment()
-        app = env._application({})
+        app = env.get_application()
         self.assertIsInstance(app, Application)
         self.assertEqual(len(app.handlers), 0)
 
@@ -52,7 +52,7 @@ class EnvironmentTest(TestCase):
 
         self.assertEqual(len(env._handlers), 1)
 
-        app = env._application({})
+        app = env.get_application()
         self.assertEqual(len(app.handlers), 1)
         (host_pattern, [spec]) = app.handlers[0]
         self.assertEqual(host_pattern.pattern, '.*$')
