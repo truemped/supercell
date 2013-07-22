@@ -29,7 +29,6 @@ connection pooling, e.g.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import namedtuple
-import logging
 
 from tornado.web import Application as _TAPP
 
@@ -65,7 +64,7 @@ class Environment(object):
         self._health_checks = {}
         self._finalized = False
 
-    def add_handler(self, path, handler_class, init_dict, name=None,
+    def add_handler(self, path, handler_class, init_dict=None, name=None,
             host_pattern='.*$'):
         '''Add a handler to the :class:`tornado.web.Application`.
 
@@ -76,7 +75,7 @@ class Environment(object):
             class MyService(s.Service):
 
                 def run():
-                    self.environment.add_handler('/', Handler, {})
+                    self.environment.add_handler('/', Handler)
 
         :param path: The regular expression for the URL path the handler should
                      be bound to.
@@ -199,10 +198,14 @@ class Environment(object):
                                     **self.tornado_settings)
 
             for handler in self._handlers:
-                self._app.add_handlers(handler.host_pattern,
-                                            [(handler.path,
-                                                handler.handler_class,
-                                                handler.init_dict)])
+                if handler.init_dict:
+                    spec = (handler.path, handler.handler_class,
+                            handler.init_dict)
+                else:
+                    spec = (handler.path, handler.handler_class)
+
+                self._app.add_handlers(handler.host_pattern, [spec])
+
         return self._app
 
     @property
