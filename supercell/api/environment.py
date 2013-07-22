@@ -221,8 +221,3 @@ class Environment(object):
             self._config_name = '%s_%s.cfg' % (getpass.getuser(),
                                                socket.gethostname())
         return self._config_name
-
-    def get_logger(self, name):
-        '''Get a logger with the given name.'''
-        logger = logging.getLogger(name)
-        return logger

@@ -18,6 +18,7 @@
 from __future__ import absolute_import, division, print_function, with_statement
 from functools import partial
 import json
+import logging
 import time
 
 from schematics.models import Model
@@ -65,7 +66,7 @@ class RequestHandler(rq):
         '''
         if not hasattr(self, '_logger'):
             name = '%s:%s' % (self.__class__.__name__, self.request_id)
-            self._logger = self.environment.get_logger(name)
+            self._logger = logging.getLogger(name)
         return self._logger
 
     @property
