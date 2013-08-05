@@ -34,7 +34,7 @@ class EnvironmentTest(TestCase):
         env = Environment()
         app = env.get_application()
         self.assertIsInstance(app, Application)
-        self.assertEqual(len(app.handlers), 0)
+        self.assertEqual(len(app.handlers), 2)
 
     def test_config_file_paths(self):
         env = Environment()
@@ -53,8 +53,9 @@ class EnvironmentTest(TestCase):
         self.assertEqual(len(env._handlers), 1)
 
         app = env.get_application()
-        self.assertEqual(len(app.handlers), 1)
-        (host_pattern, [spec]) = app.handlers[0]
+        self.assertEqual(len(app.handlers), 3)
+        (host_pattern, [spec]) = [h for h in app.handlers
+                                  if not h[1][0].regex.pattern.startswith('/_system')][0]
         self.assertEqual(host_pattern.pattern, '.*$')
         self.assertEqual(spec.regex.pattern, '/test$')
         self.assertEqual(spec.handler_class, MyHandler)

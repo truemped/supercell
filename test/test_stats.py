@@ -28,7 +28,7 @@ from tornado.testing import AsyncHTTPTestCase
 
 import supercell.api as s
 from supercell.api.environment import Environment
-from supercell.api.service import ScalesSupercellHandler
+from supercell.api.environment import ScalesSupercellHandler
 
 
 class SimpleMessage(Model):

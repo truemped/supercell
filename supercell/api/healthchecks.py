@@ -18,9 +18,9 @@
 '''Health checks provide a way for the hoster to check if the application is
 still running and working as expected.
 
-The most basic health check is enabled by default on the */_system* route. This
-is a very simple check if the process is running and provides no details to
-your application checks.
+The most basic health check is enabled by default on the */_system/check*
+route. This is a very simple check if the process is running and provides no
+details to your application checks.
 
 To demonstrate the idea we will describe a simple health check perfoming a
 request to a HTTP resource and return the appropriate result::
@@ -46,21 +46,21 @@ run method::
                                               SimpleHttpResourceCheck)
 
 When the service is then started you can access the check as
-*/_system/http_resource*::
+*/_system/check/http_resource*::
 
-    $ curl 'http://127.0.0.1/_system/http_resource'
+    $ curl 'http://127.0.0.1/_system/check/http_resource'
     {"code": "OK", "ok": true}
 
 The HTTP response code will be **200** when everything is ok. Any error,
 **WARNING** or **ERROR** will return the HTTP code **500**. A warning will
 return the response::
 
-    $ curl 'http://127.0.0.1/_system/http_resource_with_warning'
+    $ curl 'http://127.0.0.1/_system/check/http_resource_with_warning'
     {"code": "WARNING", "error": true}
 
 and an error a similar one::
 
-    $ curl 'http://127.0.0.1/_system/http_resource_with_warning'
+    $ curl 'http://127.0.0.1/_system/check/http_resource_with_warning'
     {"code": "ERROR", "error": true}
 '''
 from __future__ import absolute_import, division, print_function, with_statement

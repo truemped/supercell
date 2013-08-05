@@ -32,11 +32,11 @@ class TestBasicHealthChecks(AsyncHTTPTestCase):
 
     def get_app(self):
         env = Environment()
-        env.add_handler('/_system', SystemHealthCheck)
+        env.add_handler('/_system/check', SystemHealthCheck)
         return env.get_application()
 
     def test_simple_check(self):
-        response = self.fetch('/_system')
+        response = self.fetch('/_system/check')
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body,
                 '{"message": "API running", "code": "OK", "ok": true}')
@@ -63,16 +63,16 @@ class TestCustomHealthCheck(AsyncHTTPTestCase):
 
     def get_app(self):
         env = Environment()
-        env.add_handler('/_system/test', SimpleHealthCheckExample)
-        env.add_handler('/_system/error', SimpleErrorCheckExample)
+        env.add_health_check('test', SimpleHealthCheckExample)
+        env.add_health_check('error', SimpleErrorCheckExample)
         return env.get_application()
 
     def test_simple_warning(self):
-        response = self.fetch('/_system/test')
+        response = self.fetch('/_system/check/test')
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body, '{"code": "WARNING", "error": true}')
 
     def test_simple_error(self):
-        response = self.fetch('/_system/error')
+        response = self.fetch('/_system/check/error')
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body, '{"code": "ERROR", "error": true}')

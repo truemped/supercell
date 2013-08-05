@@ -29,9 +29,16 @@ connection pooling, e.g.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import namedtuple
+import json
+
+from greplin import scales
+from greplin.scales import util
 
 from tornado.web import Application as _TAPP
 
+from supercell.api.decorators import async
+from supercell.api.healthchecks import SystemHealthCheck
+from supercell.api.requesthandler import RequestHandler
 
 __all__ = ['Environment']
 
@@ -160,7 +167,6 @@ class Environment(object):
         :param check: The request handler performing the health check
         :type check: A :class:`supercell.api.RequestHandler`
         '''
-        assert name is not 'stats', 'Reserved name for /_system/* route'
         assert not self._finalized
         assert name not in self._health_checks
         self._health_checks[name] = check
@@ -204,6 +210,20 @@ class Environment(object):
             self._app = Application(self, config,
                                     **self.tornado_settings)
 
+            # add the stats handler
+            self._app.add_handlers('.*', [('/_system/stats',
+                                          ScalesSupercellHandler)])
+
+            # add the default health check
+            self._app.add_handlers('.*', [('/_system/check',
+                                           SystemHealthCheck)])
+
+            # add the custom health checks
+            for check_name in self.health_checks:
+                check = self.health_checks[check_name]
+                self._app.add_handlers('.*', [('/_system/check/%s' % check_name,
+                                              check)])
+
             for handler in self._handlers:
                 if handler.init_dict:
                     spec = (handler.path, handler.handler_class,
@@ -238,3 +258,22 @@ class Environment(object):
             self._config_name = '%s_%s.cfg' % (getpass.getuser(),
                                                socket.gethostname())
         return self._config_name
+
+
+class ScalesSupercellHandler(RequestHandler):
+    '''Simple handler that returns the available **supercell** stats metrics
+    as `json`.'''
+
+    @async
+    def get(self, path):
+        '''Return the `greplin.scales` stats collected so far.'''
+        path = path or ''
+        path = path.lstrip('/')
+        parts = path.split('/')
+        if not parts[0]:
+            parts = parts[1:]
+        statDict = util.lookup(scales.getStats(), parts)
+
+        serialized = json.dumps(statDict, cls=scales.StatContainerEncoder)
+        self.set_header('Content-Type', 'application/json')
+        self.finish(serialized)
