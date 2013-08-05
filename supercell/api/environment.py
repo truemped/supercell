@@ -211,7 +211,7 @@ class Environment(object):
                                     **self.tornado_settings)
 
             # add the stats handler
-            self._app.add_handlers('.*', [('/_system/stats',
+            self._app.add_handlers('.*', [('/_system/stats(.*)',
                                           ScalesSupercellHandler)])
 
             # add the default health check
