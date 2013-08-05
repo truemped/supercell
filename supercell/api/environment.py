@@ -160,6 +160,7 @@ class Environment(object):
         :param check: The request handler performing the health check
         :type check: A :class:`supercell.api.RequestHandler`
         '''
+        assert name is not 'stats', 'Reserved name for /_system/* route'
         assert not self._finalized
         assert name not in self._health_checks
         self._health_checks[name] = check

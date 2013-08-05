@@ -23,7 +23,11 @@ files as well as the command line. In the final step the
 from __future__ import absolute_import, division, print_function, with_statement
 
 import logging
+import json
 import os
+
+from greplin import scales
+from greplin.scales import util
 
 import tornado.options
 from tornado.httpserver import HTTPServer
@@ -31,8 +35,10 @@ from tornado.ioloop import IOLoop
 from tornado.options import define
 
 from supercell.api.environment import Environment
+from supercell.api.decorators import async
 from supercell.api.healthchecks import SystemHealthCheck
 from supercell.api.logging import SupercellLoggingHandler
+from supercell.api.requesthandler import RequestHandler
 
 
 define('logfile', default='root.log', help='Filename to store the logs')
@@ -107,7 +113,10 @@ class Service(object):
         for check_name in self.environment.health_checks:
             check = self.environment.health_checks[check_name]
             self.environment.add_handler('/_system/%s' % check,
-                                         check, {})
+                                         check)
+
+        # add the stats handler
+        self.environment.add_handler('/_system/stats', ScalesSupercellHandler)
 
         # do not allow any changes on the environment anymore.
         self.environment._finalize()
@@ -196,3 +205,22 @@ class Service(object):
         '''Implement this method in order to add handlers and managed objects
         to the environment, before the app is started.'''
         pass
+
+
+class ScalesSupercellHandler(RequestHandler):
+    '''Simple handler that returns the available **supercell** stats metrics
+    as `json`.'''
+
+    @async
+    def get(self, path):
+        '''Return the `greplin.scales` stats collected so far.'''
+        path = path or ''
+        path = path.lstrip('/')
+        parts = path.split('/')
+        if not parts[0]:
+            parts = parts[1:]
+        statDict = util.lookup(scales.getStats(), parts)
+
+        serialized = json.dumps(statDict, cls=scales.StatContainerEncoder)
+        self.set_header('Content-Type', 'application/json')
+        self.finish(serialized)

@@ -51,3 +51,10 @@ Health Checks
 
 .. automodule:: supercell.api.healthchecks
     :members:
+
+
+Statistics
+----------
+
+.. automodule:: supercell.api.stats
+   :members:

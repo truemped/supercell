@@ -25,6 +25,7 @@ from supercell.api.cache import cache, CacheConfig
 from supercell.api.service import Service
 from supercell.api.healthchecks import (HealthCheckOk, HealthCheckWarning,
                                         HealthCheckError)
+from supercell.api.stats import latency, metered
 
 
 __all__ = [
@@ -44,4 +45,6 @@ __all__ = [
     'HealthCheckOk',
     'HealthCheckWarning',
     'HealthCheckError',
+    'latency',
+    'metered',
 ]
