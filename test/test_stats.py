@@ -50,7 +50,17 @@ class MyHandler(s.RequestHandler):
     @s.metered
     @gen.coroutine
     def _long_method(self):
+        a = MyTestObject()
+        assert a.do_something() == 'blah'
         raise s.Return('TEST')
+
+
+class MyTestObject(object):
+
+    @s.latency
+    @s.metered
+    def do_something(self):
+        return 'blah'
 
 
 class TestSupercellStats(AsyncHTTPTestCase):
@@ -92,3 +102,9 @@ class TestSupercellStats(AsyncHTTPTestCase):
         self.assertEqual(result['latency']['get']['count'], 2)
         self.assertEqual(result['latency']['_long_method']['count'], 2)
         self.assertEqual(result['_long_method']['count'], 2)
+
+        response = self.fetch('/_system/stats/')
+        self.assertEqual(response.code, 200)
+        result = json.loads(response.body)
+        self.assertEqual(result['_internal']['test_stats']['MyTestObject']['do_something']['count'], 2)
+        self.assertEqual(result['_internal']['test_stats']['MyTestObject']['latency']['do_something']['count'], 2)

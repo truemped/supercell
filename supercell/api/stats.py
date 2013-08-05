@@ -23,6 +23,10 @@ import time
 from greplin import scales
 from greplin.scales.meter import MeterStat
 
+from tornado.concurrent import Future
+
+from supercell.api.requesthandler import RequestHandler
+
 
 def latency(fn):
     '''Measure execution latency of a certain request method.
@@ -51,17 +55,32 @@ def latency(fn):
         if not hasattr(self.__class__, '_stats_latency'):
             self.__class__._stats_latency = scales.NamedPmfDictStat('latency')
 
-        original_on_finish = self.on_finish
-        def latency_on_finish(*args, **kwargs):
-            latency = time.time() - start
-            self._stats_latency[fn.__name__].addValue(latency)
-            original_on_finish(*args, **kwargs)
+        if isinstance(self, RequestHandler):
+            original_on_finish = self.on_finish
+            def latency_on_finish(*args, **kwargs):
+                latency = time.time() - start
+                self._stats_latency[fn.__name__].addValue(latency)
+                original_on_finish(*args, **kwargs)
 
-        self.on_finish = latency_on_finish
+            self.on_finish = latency_on_finish
 
-        scales.init(self, self.request.path)
-        start = time.time()
-        return fn(self, *args, **kwargs)
+            scales.init(self, self.request.path)
+            start = time.time()
+            return fn(self, *args, **kwargs)
+        else:
+            def done_callback(*args, **kwargs):
+                latency = time.time() - start
+                self._stats_latency[fn.__name__].addValue(latency)
+
+            scales.init(self, '/'.join(['_internal', self.__module__,
+                                        self.__class__.__name__]))
+            start = time.time()
+            result = fn(self, *args, **kwargs)
+            if isinstance(result, Future):
+                result.add_done_callback(done_callback)
+            else:
+                done_callback()
+            return result
 
     return wrapper
 
@@ -85,11 +104,17 @@ def metered(fn):
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
 
-        if not hasattr(self.__class__, '_stats_metered'):
-            self.__class__._stats_metered = MeterStat(fn.__name__)
+        attr_name = '_stats_metered_%s' % fn.__name__
 
-        scales.init(self, self.request.path)
-        self._stats_metered.mark()
+        if not hasattr(self.__class__, '_stats_metered'):
+            setattr(self.__class__, attr_name, MeterStat(fn.__name__))
+
+        if isinstance(self, RequestHandler):
+            scales.init(self, self.request.path)
+        else:
+            scales.init(self, '/'.join(['_internal', self.__module__,
+                                        self.__class__.__name__]))
+        getattr(self, attr_name).mark()
 
         return fn(self, *args, **kwargs)
 
