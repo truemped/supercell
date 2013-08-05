@@ -22,6 +22,7 @@ import json
 from schematics.models import Model
 from schematics.types import StringType
 
+from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 
@@ -39,10 +40,17 @@ class SimpleMessage(Model):
 class MyHandler(s.RequestHandler):
 
     @s.latency
-    @s.metered
     @s.async
     def get(self, *args, **kwargs):
+        future = self._long_method()
+        assert future.result() == 'TEST'
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+
+    @s.latency
+    @s.metered
+    @gen.coroutine
+    def _long_method(self):
+        raise s.Return('TEST')
 
 
 class TestSupercellStats(AsyncHTTPTestCase):
@@ -70,8 +78,10 @@ class TestSupercellStats(AsyncHTTPTestCase):
 
         response = self.fetch('/_system/stats/teststats')
         self.assertEqual(response.code, 200)
-        self.assertEqual(response.body, '{"latency": {"GET": {"count": 1}},' + \
-                ' "GET": {"count": 1, "unit": "per second"}}')
+        expected = '{"latency": {"_long_method": {"count": 1}, "get":' + \
+                ' {"count": 1}}, "_long_method": {"count": 1, "unit":' + \
+                ' "per second"}}'
+        self.assertEqual(response.body, expected)
 
         response = self.fetch('/teststats')
         self.assertEqual(response.code, 200)
@@ -79,5 +89,6 @@ class TestSupercellStats(AsyncHTTPTestCase):
         response = self.fetch('/_system/stats/teststats')
         self.assertEqual(response.code, 200)
         result = json.loads(response.body)
-        self.assertEqual(result['latency']['GET']['count'], 2)
-        self.assertEqual(result['GET']['count'], 2)
+        self.assertEqual(result['latency']['get']['count'], 2)
+        self.assertEqual(result['latency']['_long_method']['count'], 2)
+        self.assertEqual(result['_long_method']['count'], 2)

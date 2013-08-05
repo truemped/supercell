@@ -54,7 +54,7 @@ def latency(fn):
         original_on_finish = self.on_finish
         def latency_on_finish(*args, **kwargs):
             latency = time.time() - start
-            self._stats_latency[self.request.method].addValue(latency)
+            self._stats_latency[fn.__name__].addValue(latency)
             original_on_finish(*args, **kwargs)
 
         self.on_finish = latency_on_finish
@@ -86,7 +86,7 @@ def metered(fn):
     def wrapper(self, *args, **kwargs):
 
         if not hasattr(self.__class__, '_stats_metered'):
-            self.__class__._stats_metered = MeterStat(self.request.method)
+            self.__class__._stats_metered = MeterStat(fn.__name__)
 
         scales.init(self, self.request.path)
         self._stats_metered.mark()
