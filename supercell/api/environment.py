@@ -29,6 +29,7 @@ connection pooling, e.g.
 from __future__ import absolute_import, division, print_function, with_statement
 
 from collections import namedtuple
+from datetime import timedelta
 import json
 
 from greplin import scales
@@ -36,6 +37,7 @@ from greplin.scales import util
 
 from tornado.web import Application as _TAPP
 
+from supercell.api.cache import CacheConfigT
 from supercell.api.decorators import async
 from supercell.api.healthchecks import SystemHealthCheck
 from supercell.api.requesthandler import RequestHandler
@@ -44,7 +46,7 @@ __all__ = ['Environment']
 
 
 Handler = namedtuple('Handler', ['host_pattern', 'path', 'handler_class',
-                                 'init_dict', 'name', 'cache'])
+                                 'init_dict', 'name', 'cache', 'expires'])
 
 
 class Application(_TAPP):
@@ -68,12 +70,13 @@ class Environment(object):
         '''Initialize the handlers and health checks variables.'''
         self._handlers = []
         self._cache_infos = {}
+        self._expires_infos = {}
         self._managed_objects = {}
         self._health_checks = {}
         self._finalized = False
 
     def add_handler(self, path, handler_class, init_dict=None, name=None,
-            host_pattern='.*$', cache=None):
+            host_pattern='.*$', cache=None, expires=None):
         '''Add a handler to the :class:`tornado.web.Application`.
 
         The environment will manage the available request handlers and managed
@@ -107,14 +110,23 @@ class Environment(object):
 
         :param cache: Cache info for GET and HEAD requests to this handler
                       defined by :class:`supercell.api.cache.CacheConfig`.
-        :type cache: supercell.api.cache.CacheConfigT
+        :type cache: supercell.api.cache.CacheConfig
+
+        :param expires: Set the `Expires` header according to the provided
+                        timedelta
+        :type expires: datetime.timedelta
         '''
         assert not self._finalized, 'Do not change the environment at runtime'
         handler = Handler(host_pattern=host_pattern, path=path,
                           handler_class=handler_class, init_dict=init_dict,
-                          name=name, cache=cache)
+                          name=name, cache=cache, expires=expires)
         self._handlers.append(handler)
-        self._cache_infos[handler_class] = cache
+        if cache:
+            assert isinstance(cache, CacheConfigT), 'cache is not a CacheConfig'
+            self._cache_infos[handler_class] = cache
+        if expires:
+            assert isinstance(expires, timedelta), 'expires is not a timedelta'
+            self._expires_infos[handler_class] = expires
 
     def add_managed_object(self, name, instance):
         '''Add a managed instance to the environment.
@@ -238,9 +250,13 @@ class Environment(object):
     def get_cache_info(self, handler):
         '''Return the :class:`supercell.api.cache.CacheConfig` for a certain
         handler.'''
-        if handler not in self._cache_infos:
-            return None
-        return self._cache_infos[handler]
+        return self._cache_infos.get(handler, None)
+
+    def get_expires_info(self, handler):
+        '''Return the `timedelta` for a specific handler that should define the
+        `Expires` header for GET and HEAD requests.'''
+        return self._expires_infos.get(handler, None)
+
 
     @property
     def config_name(self):

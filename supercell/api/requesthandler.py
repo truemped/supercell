@@ -16,6 +16,8 @@
 #
 #
 from __future__ import absolute_import, division, print_function, with_statement
+
+from datetime import datetime
 from functools import partial
 import json
 import logging
@@ -115,6 +117,10 @@ class RequestHandler(rq):
                 if cache_config:
                     self.set_header('Cache-Control',
                                     compute_cache_header(cache_config))
+
+                expires = self.environment.get_expires_info(self.__class__)
+                if expires:
+                    self.set_header('Expires', datetime.now() + expires)
 
             future_model = method(*self.path_args, **kwargs)
             callback = partial(self._provide_result, verb, headers)
