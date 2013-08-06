@@ -173,7 +173,6 @@ class SimpleMessage(Model):
 class MyHandler(RequestHandler):
 
     @s.async
-    @s.cache(timedelta(minutes=10))
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
@@ -182,9 +181,6 @@ class MyHandler(RequestHandler):
 class MyExtremeCachingHandler(RequestHandler):
 
     @s.async
-    @s.cache(timedelta(minutes=10), s_max_age=timedelta(minutes=10),
-             public=True, must_revalidate=True,
-             proxy_revalidate=True)
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
@@ -193,8 +189,6 @@ class MyExtremeCachingHandler(RequestHandler):
 class MyPrivateCaching(RequestHandler):
 
     @s.async
-    @s.cache(timedelta(seconds=10), s_max_age=timedelta(seconds=0),
-             private=True, no_store=True)
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
 
@@ -202,7 +196,6 @@ class MyPrivateCaching(RequestHandler):
 class CachingWithYielding(RequestHandler):
 
     @s.async
-    @s.cache(timedelta(seconds=10))
     def get(self, *args, **kwargs):
         result = yield self.a_coroutine()
         assert result, 'yes'
@@ -234,23 +227,23 @@ class TestCacheDecorator(AsyncHTTPTestCase):
 
     def get_app(self):
         env = Environment()
-        env.add_handler(r'/', MyHandler)
-        env.add_handler(r'/cache', MyExtremeCachingHandler)
-        env.add_handler(r'/private', MyPrivateCaching)
-        env.add_handler(r'/nested_async', CachingWithYielding)
-        env.add_handler(r'/without_decorator', CachingWithoutDecorator,
+        env.add_handler(r'/', MyHandler,
                         cache=CacheConfig(timedelta(minutes=10)))
+        env.add_handler(r'/cache', MyExtremeCachingHandler,
+                        cache=CacheConfig(timedelta(minutes=10),
+                                          s_max_age=timedelta(minutes=10),
+                                          public=True, must_revalidate=True,
+                                          proxy_revalidate=True))
+        env.add_handler(r'/private', MyPrivateCaching,
+                        cache=CacheConfig(timedelta(seconds=10),
+                                          s_max_age=timedelta(seconds=0),
+                                          private=True, no_store=True))
+        env.add_handler(r'/nested_async', CachingWithYielding,
+                        cache=CacheConfig(timedelta(seconds=10)))
         return env.get_application({})
 
     def test_simple_timedelta(self):
         response = self.fetch('/')
-        self.assertEqual(response.code, 200)
-        self.assertTrue('Cache-Control' in response.headers)
-        self.assertEqual('max-age=600, must-revalidate',
-                         response.headers['Cache-Control'])
-
-    def test_simple_timedelta_without_decorator(self):
-        response = self.fetch('/without_decorator')
         self.assertEqual(response.code, 200)
         self.assertTrue('Cache-Control' in response.headers)
         self.assertEqual('max-age=600, must-revalidate',

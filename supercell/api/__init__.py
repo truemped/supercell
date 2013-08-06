@@ -21,7 +21,7 @@ from supercell.api.metatypes import (ContentType, MediaType, Return, Ok,
                                      Error, OkCreated)
 from supercell.api.requesthandler import RequestHandler
 from supercell.api.decorators import provides, consumes, async
-from supercell.api.cache import cache, CacheConfig
+from supercell.api.cache import CacheConfig
 from supercell.api.service import Service
 from supercell.api.healthchecks import (HealthCheckOk, HealthCheckWarning,
                                         HealthCheckError)
@@ -30,7 +30,6 @@ from supercell.api.stats import latency, metered
 
 __all__ = [
     'async',
-    'cache',
     'CacheConfig',
     'ContentType',
     'MediaType',
