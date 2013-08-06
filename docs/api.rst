@@ -58,3 +58,9 @@ Statistics
 
 .. automodule:: supercell.api.stats
    :members:
+
+Caching
+-------
+
+.. automodule:: supercell.api.cache
+   :members:
