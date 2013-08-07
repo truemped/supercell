@@ -6,13 +6,14 @@ HTTP APIs. It resembles many ideas from Coda Hale's
 `Dropwizard <http://dropwizard.codahale.com/>`_, a similar library
 for JVM based HTTP APIs.
 
-|TravisImage|_ |CodeQ|_
+|TravisImage|_ |CodeQ|_ |CoverAlls|_
 
 .. |TravisImage| image:: https://travis-ci.org/truemped/supercell.png?branch=master
 .. _TravisImage: https://travis-ci.org/truemped/supercell
 .. |CodeQ| image:: https://codeq.io/github/truemped/supercell/badges/master.png
 .. _CodeQ: https://codeq.io/github/truemped/supercell/branches/master
-
+.. |CoverAlls| image:: https://coveralls.io/repos/truemped/supercell/badge.png?branch=master
+.. _CoverAlls: https://coveralls.io/repos/truemped/supercell/
 
 Example
 =======
@@ -141,3 +142,4 @@ example the header is set to::
 For a detailed description of the available options see the `Caching
 Tutorial <http://www.mnot.net/cache_docs/>` and the official `RFC2616, sec
 14.9 <http://www.ietf.org/rfc/rfc2616.txt>`.
+

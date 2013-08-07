@@ -26,8 +26,9 @@ PY2 = sys.version_info[0] == 2
 
 
 tests_require = [
-'tornado-pyvows>=0.5.0',
-'mock==1.0.1',
+    'mock',
+    'pytest',
+    'pytest-cov',
 ]
 
 if sys.version_info < (2, 7):
@@ -36,7 +37,6 @@ if sys.version_info < (2, 7):
 
 extras_require = {}
 extras_require['test'] = tests_require
-extras_require['coverage'] = 'coverage == 3.6'
 extras_require['futures'] = ''
 if PY2:
     extras_require['futures'] = 'futures == 2.1.3'

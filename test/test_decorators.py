@@ -25,7 +25,7 @@ if sys.version_info > (2, 7):
 else:
     from unittest2 import TestCase
 
-from nose.tools import raises
+from pytest import raises
 
 from supercell.api import (RequestHandler, provides, consumes, MediaType)
 
@@ -33,12 +33,12 @@ from supercell.api import (RequestHandler, provides, consumes, MediaType)
 class TestConsumesDecorator(TestCase):
     '''Test the consumes decorator.'''
 
-    @raises(AssertionError)
     def test_on_non_class(self):
 
-        @consumes(MediaType.ApplicationJson, object)
-        def get():
-            pass
+        with raises(AssertionError):
+            @consumes(MediaType.ApplicationJson, object)
+            def get():
+                pass
 
     def test_simple_consumes_decorator_with_post(self):
 
@@ -98,12 +98,12 @@ class TestConsumesDecorator(TestCase):
 class TestProvidesDecorator(TestCase):
     '''Test the consumes decorator.'''
 
-    @raises(AssertionError)
     def test_on_non_class(self):
 
-        @provides(MediaType.ApplicationJson)
-        def get():
-            pass
+        with raises(AssertionError):
+            @provides(MediaType.ApplicationJson)
+            def get():
+                pass
 
     def test_simple_provides_decorator_with_post(self):
 

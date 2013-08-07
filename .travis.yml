@@ -7,10 +7,11 @@ python:
 # command to install dependencies
 install:
     - pip install -r requirements.txt --use-mirrors
+    - pip install -r requirements-test.txt --use-mirrors
+    - pip install coveralls --use-mirrors
     - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors unittest2; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == 2* && $DEPS == true ]]; then pip install --use-mirrors futures mock; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' && $DEPS == true ]]; then pip install --use-mirrors futures mock; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install --use-mirrors mock; fi
-# command to run tests
+    - python setup.py install
 script:
-    - nosetests test/
+    - python travistest.py
+after_success:
+    - coveralls

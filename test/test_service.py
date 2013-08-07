@@ -23,7 +23,9 @@ if sys.version_info > (2, 7):
 else:
     from unittest2 import TestCase
 
-from mock import patch
+import mock
+import pytest
+
 from schematics.models import Model
 from schematics.types import StringType
 from tornado.ioloop import IOLoop
@@ -80,6 +82,10 @@ class MyService(s.Service):
 
 class ServiceTest(TestCase):
 
+    @pytest.fixture(autouse=True)
+    def empty_commandline(self, monkeypatch):
+        monkeypatch.setattr(sys, 'argv', [])
+
     def test_environment_creation(self):
         service = s.Service()
         env = service.environment
@@ -102,7 +108,7 @@ class ServiceTest(TestCase):
 
         service.initialize_logging()
 
-    @patch('tornado.ioloop.IOLoop.instance')
+    @mock.patch('tornado.ioloop.IOLoop.instance')
     def test_main_method(self, ioloop_instance_mock):
         service = MyService()
         service.main()
