@@ -42,9 +42,6 @@ if not PY2:
     imap = map
     izip = zip
 
-    implements_iterator = _identity
-    implements_to_string = _identity
-
 else:
     unichr = chr
     range_type = xrange
@@ -56,16 +53,6 @@ else:
     iteritems = lambda d: d.iteritems()
 
     from itertools import imap, izip, ifilter
-
-    def implements_iterator(cls):
-        cls.next = cls.__next__
-        del cls.__next__
-        return cls
-
-    def implements_to_string(cls):
-        cls.__unicode__ = cls.__str__
-        cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
-        return cls
 
 
 def with_metaclass(meta, *bases):
