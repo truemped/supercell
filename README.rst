@@ -13,7 +13,7 @@ for JVM based HTTP APIs.
 .. |CodeQ| image:: https://codeq.io/github/truemped/supercell/badges/master.png
 .. _CodeQ: https://codeq.io/github/truemped/supercell/branches/master
 .. |CoverAlls| image:: https://coveralls.io/repos/truemped/supercell/badge.png?branch=master
-.. _CoverAlls: https://coveralls.io/repos/truemped/supercell/
+.. _CoverAlls: https://coveralls.io/r/truemped/supercell
 
 Example
 =======
