@@ -123,8 +123,9 @@ class RequestHandler(rq):
                     self.set_header('Expires', datetime.now() + expires)
 
             future_model = method(*self.path_args, **kwargs)
-            callback = partial(self._provide_result, verb, headers)
-            future_model.add_done_callback(callback)
+            if future_model:
+                callback = partial(self._provide_result, verb, headers)
+                future_model.add_done_callback(callback)
 
     def _provide_result(self, verb, headers, future_model):
         '''Find the correct provider for the result and call it with the final
