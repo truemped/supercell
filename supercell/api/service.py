@@ -49,6 +49,9 @@ define('address', default='127.0.0.1', help='Address to bind on')
 define('socketfd', default=None, help='Filedescriptor used from circus')
 
 
+define('debug', default=False, help='If set, tornado is started in debug mode')
+
+
 class Service(object):
     '''Main service implementation managing the
     :class:`tornado.web.Application` and taking care of configuration.'''
@@ -103,6 +106,8 @@ class Service(object):
 
         # do not allow any changes on the environment anymore.
         self.environment._finalize()
+
+        self.environment.tornado_settings['debug'] = self.config.debug
 
         return self.environment.get_application(self.config)
 
