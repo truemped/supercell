@@ -1,3 +1,15 @@
+0.4.0 -
+------------------------
+
+- enable tornado debug mode in the config
+- Only add future callbacks if it is a future in the
+  request handler
+- Unittests using py.test
+- HTTP Expires header support
+- Caching configurable when adding the handlers
+- Stats collecting using scales
+- Fixed logging configuration
+
 0.3.0 - (July, 16, 2013)
 ------------------------
 
