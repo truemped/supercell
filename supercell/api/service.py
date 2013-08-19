@@ -101,6 +101,9 @@ class Service(object):
         # perform all the configuration parsing
         self.config
 
+        # initialize logging
+        self.initialize_logging()
+
         # add handlers, health checks, managed objects to the environment
         self.run()
 
@@ -115,7 +118,6 @@ class Service(object):
     def slog(self):
         '''Initialize the logging and return the logger.'''
         if not hasattr(self, '_slog'):
-            self.initialize_logging()
             self._slog = logging.getLogger('supercell')
         return self._slog
 
