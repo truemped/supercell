@@ -155,7 +155,13 @@ class Service(object):
             /etc/myservice/user_hostname.cfg
             ./etc/config.cfg
             ./etc/user_hostname.cfg
+
+        .. note::
+            By default we disable the :py:mod:`tornado.log` module, you can
+            enable this though using by setting the `logging` config to some
+            valid log level string.
         '''
+        tornado.options.options._options['logging'].set('none')
         filename = self.environment.config_name
         for path in self.environment.config_file_paths:
             cfg = os.path.join(path, 'config.cfg')
