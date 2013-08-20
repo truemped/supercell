@@ -189,7 +189,7 @@ class Service(object):
         hdlrs = [h for h in root.handlers
                  if isinstance(h, SupercellLoggingHandler)]
         if len(hdlrs) == 0:
-            root.setLevel(self.config.loglevel)
+            root.setLevel(getattr(logging, self.config.loglevel))
             root.addHandler(SupercellLoggingHandler(self.config.logfile))
 
     def bootstrap(self):
