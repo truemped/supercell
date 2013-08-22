@@ -52,6 +52,10 @@ define('socketfd', default=None, help='Filedescriptor used from circus')
 define('debug', default=False, help='If set, tornado is started in debug mode')
 
 
+define('show_config_file_order', default=False,
+       help='Show the order of config files to be parsed')
+
+
 define('show_config_name', default=False,
        help='Show the local config file name')
 
@@ -87,6 +91,13 @@ class Service(object):
 
         if self.config.show_config_name:
             print(self.environment.config_name)
+            raise SystemExit(1)
+
+        if self.config.show_config_file_order:
+            filename = self.environment.config_name
+            for path in self.environment.config_file_paths:
+                print(os.path.join(path, 'config.cfg'))
+                print(os.path.join(path, filename))
             raise SystemExit(1)
 
         server = HTTPServer(app)
