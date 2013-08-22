@@ -52,6 +52,14 @@ define('socketfd', default=None, help='Filedescriptor used from circus')
 define('debug', default=False, help='If set, tornado is started in debug mode')
 
 
+define('show_config_name', default=False,
+       help='Show the local config file name')
+
+
+define('show_config', default=False,
+       help='Show the effective configuration')
+
+
 class Service(object):
     '''Main service implementation managing the
     :class:`tornado.web.Application` and taking care of configuration.'''
@@ -71,6 +79,15 @@ class Service(object):
         descriptor.
         '''
         app = self.get_app()
+
+        if self.config.show_config:
+            from pprint import pprint
+            pprint(self.config.as_dict())
+            raise SystemExit(1)
+
+        if self.config.show_config_name:
+            print(self.environment.config_name)
+            raise SystemExit(1)
 
         server = HTTPServer(app)
 
