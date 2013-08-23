@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 #
-__version__ = (0, 4, 0, 'beta3')
+__version__ = (0, 4, 0, 'beta4')

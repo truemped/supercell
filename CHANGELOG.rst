@@ -1,6 +1,7 @@
 0.4.0 -
 ------------------------
 
+- show-config, show-config-name and show-config-file-order
 - enable tornado debug mode in the config
 - Only add future callbacks if it is a future in the
   request handler
