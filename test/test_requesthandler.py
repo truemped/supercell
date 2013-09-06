@@ -17,8 +17,6 @@
 #
 from __future__ import absolute_import, division, print_function, with_statement
 
-import pytest
-
 from schematics.models import Model
 from schematics.types import StringType
 
@@ -118,7 +116,6 @@ class EncodingTestingHandler(s.RequestHandler):
         raise s.Return(r)
 
 
-@pytest.mark.onlyme
 class TestUrlEncoding(AsyncHTTPTestCase):
 
     def get_app(self):
