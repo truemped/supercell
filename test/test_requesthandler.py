@@ -17,6 +17,8 @@
 #
 from __future__ import absolute_import, division, print_function, with_statement
 
+import pytest
+
 from schematics.models import Model
 from schematics.types import StringType
 
@@ -104,3 +106,39 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
                               body='{"message": "Simple message"}')
         self.assertEqual(response.code, 201)
         self.assertEqual(response.body, '{"docid": 123, "ok": true}')
+
+
+@provides(s.MediaType.ApplicationJson, default=True)
+class EncodingTestingHandler(s.RequestHandler):
+
+    @s.async
+    def get(self, *args, **kwargs):
+        r = SimpleMessage(doc_id='test123',
+                          message='args=%s; kwargs=%s' % (args, kwargs))
+        raise s.Return(r)
+
+
+@pytest.mark.onlyme
+class TestUrlEncoding(AsyncHTTPTestCase):
+
+    def get_app(self):
+        env = Environment()
+        env.add_handler('/testencoding/(.*)', EncodingTestingHandler)
+        return env.get_application()
+
+    def get_new_ioloop(self):
+        return IOLoop.instance()
+
+    def test_latinone_handler(self):
+        response = self.fetch('/testencoding/alfredo-p%e9rez-rubalcaba')
+        self.assertEqual(200, response.code)
+        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' + \
+                         'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
+                         response.body)
+
+    def test_utfeight_handler(self):
+        response = self.fetch('/testencoding/alfredo-p%C3%A9rez-rubalcaba')
+        self.assertEqual(200, response.code)
+        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' + \
+                         'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
+                         response.body)

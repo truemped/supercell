@@ -24,6 +24,8 @@ import logging
 import time
 
 from schematics.models import Model
+from tornado.escape import to_unicode
+from tornado.util import bytes_type, unicode_type
 from tornado.web import RequestHandler as rq, HTTPError
 
 from supercell.api import MediaType
@@ -37,6 +39,21 @@ __all__ = ['RequestHandler']
 
 
 _DEFAULT_CONTENT_TYPE = 'DEFAULT'
+
+
+def _decode_utf8_and_latin1(value):
+    '''Convert an string argument to a unicode string.
+
+    Instead of decoding it as utf-8 we assume it is encoded as latin1.
+    '''
+    try:
+        return to_unicode(value)
+    except UnicodeDecodeError:
+        if isinstance(value, (unicode_type, type(None))):
+            return value
+        assert isinstance(value, bytes_type), \
+                'Expected bytes, unicode or None; got %s' % type(value)
+        return value.decode('latin1')
 
 
 class RequestHandler(rq):
@@ -71,6 +88,12 @@ class RequestHandler(rq):
             name = '%s:%s' % (self.__class__.__name__, self.request_id)
             self._logger = logging.getLogger(name)
         return self._logger
+
+    def decode_argument(self, value, name=None):
+        '''Overwrite the default :func:`RequestHandler.decode_argument()`
+        method in order to allow *latin1* encoded URLs.
+        '''
+        return _decode_utf8_and_latin1(value)
 
     @property
     def request_id(self):
