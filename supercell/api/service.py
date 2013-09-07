@@ -84,22 +84,6 @@ class Service(object):
         '''
         app = self.get_app()
 
-        if self.config.show_config:
-            from pprint import pprint
-            pprint(self.config.as_dict())
-            raise SystemExit(1)
-
-        if self.config.show_config_name:
-            print(self.environment.config_name)
-            raise SystemExit(1)
-
-        if self.config.show_config_file_order:
-            filename = self.environment.config_name
-            for path in self.environment.config_file_paths:
-                print(os.path.join(path, 'config.cfg'))
-                print(os.path.join(path, filename))
-            raise SystemExit(1)
-
         server = HTTPServer(app)
 
         if self.config.socketfd:
@@ -128,6 +112,23 @@ class Service(object):
 
         # perform all the configuration parsing
         self.config
+
+        # hook some mgmt commands
+        if self.config.show_config:
+            from pprint import pprint
+            pprint(self.config.as_dict())
+            raise SystemExit(1)
+
+        if self.config.show_config_name:
+            print(self.environment.config_name)
+            raise SystemExit(1)
+
+        if self.config.show_config_file_order:
+            filename = self.environment.config_name
+            for path in self.environment.config_file_paths:
+                print(os.path.join(path, 'config.cfg'))
+                print(os.path.join(path, filename))
+            raise SystemExit(1)
 
         # initialize logging
         self.initialize_logging()
