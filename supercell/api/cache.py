@@ -25,7 +25,7 @@ to the environment::
         def run(self):
             self.environment.add_handler(...,
                                          cache=CacheConfig(timedelta(minutes=10)),
-                                         expires=timedelta(minutes=10))
+                                                expires=timedelta(minutes=10))
 
 The details of setting the `CacheControl` header are documented in the
 :func:`CacheConfig`. The `expires` argument simply takes a

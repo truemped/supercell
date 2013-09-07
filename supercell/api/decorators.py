@@ -52,7 +52,7 @@ def provides(content_type, vendor=None, version=None, default=False):
     class like this::
 
         @s.provides(sMediaType.ApplicationJson)
-        class MyHandler(sRequestHandler):
+        class MyHandler(s.RequestHandler):
             pass
 
     It is also possible to support more than one content type. The content type
