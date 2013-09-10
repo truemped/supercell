@@ -29,6 +29,11 @@ def parse_accept_header(accept):
     Default `q` for values that are not specified is 1.0
     """
     result = []
+
+    if accept == 'text/*,image/*;application/*;*/*;':
+        # strange IE6 Accept header that we ignore
+        return [('', {}, 1.0)]
+
     for media_range in accept.split(","):
 
         parts = media_range.split(";")

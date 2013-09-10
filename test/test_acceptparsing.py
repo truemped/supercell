@@ -3,6 +3,7 @@
 # Taken from: https://gist.github.com/samuraisam/2714195
 #
 from unittest import TestCase
+
 from supercell.utils.acceptparsing import parse_accept_header
 
 
@@ -44,5 +45,10 @@ class TestParseAcceptHeader(TestCase):
 
     def test_parse_accept_header_really_dumb_client(self):
         accept = ""
+        should = [('', {}, 1.0)]
+        self.assertEquals(parse_accept_header(accept), should)
+
+    def test_iesix_bad_accept_header(self):
+        accept = 'text/*,image/*;application/*;*/*;'
         should = [('', {}, 1.0)]
         self.assertEquals(parse_accept_header(accept), should)
