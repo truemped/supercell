@@ -118,6 +118,10 @@ class ServiceTest(TestCase):
 
 class ApplicationIntegrationTest(AsyncHTTPTestCase):
 
+    @pytest.fixture(autouse=True)
+    def empty_commandline(self, monkeypatch):
+        monkeypatch.setattr(sys, 'argv', [])
+
     def get_new_ioloop(self):
         return IOLoop.instance()
 
