@@ -19,6 +19,7 @@ from __future__ import absolute_import, division, print_function, with_statement
 
 from schematics.models import Model
 from schematics.types import StringType
+from schematics.types import IntType
 
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
@@ -31,6 +32,7 @@ from supercell.api.environment import Environment
 class SimpleMessage(Model):
     doc_id = StringType()
     message = StringType()
+    number = IntType()
 
 
 @provides(s.MediaType.ApplicationJson)
@@ -101,9 +103,15 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
     def test_post_handler(self):
         response = self.fetch('/test_post', method='POST',
                               headers={'Content-Type': s.MediaType.ApplicationJson},
-                              body='{"message": "Simple message"}')
+                              body='{"message": "Simple message", "number": 1}')
         self.assertEqual(response.code, 201)
         self.assertEqual(response.body, '{"docid": 123, "ok": true}')
+
+    def test_post_handler_with_wrong_value_type(self):
+        response = self.fetch('/test_post', method='POST',
+                              headers={'Content-Type': s.MediaType.ApplicationJson},
+                              body='{"number": "one"}')
+        self.assertEqual(response.code, 400)
 
 
 @provides(s.MediaType.ApplicationJson, default=True)
