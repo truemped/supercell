@@ -164,6 +164,11 @@ class RequestHandler(rq):
                 self.logger.info(result.message['additional'])
             self.write(json.dumps(result.message))
 
+        elif not isinstance(result, Model):
+            # raise an error when something else than a model has been returned
+            self.logger.error('Returning a non-model is not supported')
+            raise HTTPError(500)
+
         else:
             try:
                 provider_class = ProviderBase.map_provider(
