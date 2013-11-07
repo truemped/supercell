@@ -1,6 +1,9 @@
 0.4.0 -
 ------------------------
 
+- Raise HTTPError when not returning a model
+- A ValueError thrown by Model initialization returns a 400 Error
+- fix for broken IE6 accept header
 - allow latin1 encoded urls
 - show-config, show-config-name and show-config-file-order
 - enable tornado debug mode in the config
