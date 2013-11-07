@@ -60,13 +60,11 @@ def provides(content_type, vendor=None, version=None, default=False):
     present, ordering of the :func:`provides` decorators matter, i.e. the first
     content type is used::
 
-        @s.provides(s.MediaType.ApplicationJson, model=MyModel)
+        @s.provides(s.MediaType.ApplicationJson)
         class MyHandler(s.RequestHandler):
             ...
 
     :param str content_type: The base content type such as **application/json**
-    :param model: The model that should be consumed.
-    :type model: :class:`schematics.models.Model`
     :param str vendor: Any vendor information for the base content type
     :param float version: The vendor version
     :param bool default: If **True** and no **Accept** header is present, this
