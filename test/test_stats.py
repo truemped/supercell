@@ -44,7 +44,8 @@ class MyHandler(s.RequestHandler):
     def get(self, *args, **kwargs):
         future = self._long_method()
         assert future.result() == 'TEST'
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
     @s.latency
     @s.metered

@@ -56,7 +56,7 @@ setup (
 
     install_requires=[
         'tornado >= 3.1.0',
-        'schematics == 0.6.0',
+        'schematics == 0.9-4',
         'scales == 1.0.3',
     ],
 

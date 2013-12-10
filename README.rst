@@ -30,7 +30,7 @@ Authors
 In order of contribution:
 
 * Daniel Truemper `@truemped <http://twitter.com/truemped>`_
-* Tobias Guenther `@tobigue <http://twitter.com/tobigue>`_
+* Tobias Guenther `@tobigue\_ <http://twitter.com/tobigue\_>`_
 
 
 License

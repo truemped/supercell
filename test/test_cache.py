@@ -45,7 +45,8 @@ class MyHandler(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 
 @provides(s.MediaType.ApplicationJson, default=True)
@@ -53,7 +54,8 @@ class MyExtremeCachingHandler(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 
 @provides(s.MediaType.ApplicationJson, default=True)
@@ -61,7 +63,8 @@ class MyPrivateCaching(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 @provides(s.MediaType.ApplicationJson, default=True)
 class CachingWithYielding(RequestHandler):
@@ -72,7 +75,8 @@ class CachingWithYielding(RequestHandler):
         assert result, 'yes'
         result = yield gen.Task(self.an_engine)
         assert result, 'yes again'
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
     @gen.coroutine
     def a_coroutine(self):
@@ -88,7 +92,8 @@ class CachingWithoutDecorator(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 
 class TestCacheDecorator(AsyncHTTPTestCase):

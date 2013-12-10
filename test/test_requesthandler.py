@@ -34,13 +34,17 @@ class SimpleMessage(Model):
     message = StringType()
     number = IntType()
 
+    class Options:
+        serialize_when_none=False
+
 
 @provides(s.MediaType.ApplicationJson)
 class MyHandler(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 
 @provides(s.MediaType.ApplicationJson, default=True)
@@ -48,7 +52,8 @@ class MyHandlerWithDefault(RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage(doc_id='test123', message='A test'))
+        raise s.Return(SimpleMessage({"doc_id": 'test123',
+                                      "message": 'A test'}))
 
 
 @consumes(s.MediaType.ApplicationJson, SimpleMessage)
@@ -58,7 +63,8 @@ class MyEchoHandler(RequestHandler):
     def get(self, *args, **kwargs):
         q = self.get_argument('q')
         # query solr:
-        raise s.Return(SimpleMessage(doc_id='test456', message='q: %s' % q))
+        raise s.Return(SimpleMessage({"doc_id": 'test456',
+                                      "message": 'q: %s' % q}))
 
     @s.async
     def post(self, *args, **kwargs):
@@ -119,8 +125,8 @@ class EncodingTestingHandler(s.RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
-        r = SimpleMessage(doc_id='test123',
-                          message='args=%s; kwargs=%s' % (args, kwargs))
+        r = SimpleMessage({"doc_id": 'test123',
+                           "message": 'args=%s; kwargs=%s' % (args, kwargs)})
         raise s.Return(r)
 
 

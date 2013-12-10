@@ -48,12 +48,12 @@ class MyHandler(s.RequestHandler):
     def get(self):
         self.logger.info('Holy moly')
         self.logger.info('That worked')
-        raise s.Return(SimpleModel(msg='Holy moly'))
+        raise s.Return(SimpleModel({"msg": 'Holy moly'}))
 
     @s.async
     def post(self, doc_id, model=None):
         self.logger.info('Holy moly')
-        raise s.Return(SimpleModel(msg='Holy moly'))
+        raise s.Return(SimpleModel({"msg": 'Holy moly'}))
         assert isinstance(self.environment, Environment)
         assert isinstance(self.config, tornado.options.options)
         raise s.OkCreated({'docid': 123})

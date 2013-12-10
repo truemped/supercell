@@ -133,8 +133,8 @@ class RequestHandler(rq):
                 except NoConsumerFound:
                     # TODO return available consumer types?!
                     raise HTTPError(406)
-                except ValueError:
-                    raise HTTPError(400)
+                except StandardError as e:
+                    raise HTTPError(400, reason=unicode(e))
 
             if verb in ['get', 'head']:
                 # check if there is caching information stored with the handler
