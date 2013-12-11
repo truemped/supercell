@@ -1,5 +1,10 @@
-0.4.0 -
-------------------------
+0.5.0 -
+---------------------------
+
+- upgrade schematics to 0.9-4 (#7, #8)
+
+0.4.0 - (December 09, 2013)
+---------------------------
 
 - Raise HTTPError when not returning a model
 - A ValueError thrown by Model initialization returns a 400 Error
