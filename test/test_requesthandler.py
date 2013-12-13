@@ -72,6 +72,10 @@ class MyEchoHandler(RequestHandler):
         # do something with model
         raise s.OkCreated({'docid': 123})
 
+    @s.async
+    def delete(self, *args, **kwargs):
+        raise s.NoContent()
+
 
 class TestSimpleRequestHandler(AsyncHTTPTestCase):
 
@@ -118,6 +122,10 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
                               headers={'Content-Type': s.MediaType.ApplicationJson},
                               body='{"number": "one"}')
         self.assertEqual(response.code, 400)
+
+    def test_delete(self):
+        response = self.fetch('/test_post', method='DELETE')
+        self.assertEqual(response.code, 204)
 
 
 @provides(s.MediaType.ApplicationJson, default=True)

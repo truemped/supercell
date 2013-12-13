@@ -160,9 +160,10 @@ class RequestHandler(rq):
         if isinstance(result, ReturnInformationT):
             self.set_header('Content-Type', MediaType.ApplicationJson)
             self.set_status(result.code)
-            if 'additional' in result.message:
+            if result.message and 'additional' in result.message:
                 self.logger.info(result.message['additional'])
-            self.write(json.dumps(result.message))
+            if result.code != 204:
+                self.write(json.dumps(result.message))
 
         elif not isinstance(result, Model):
             # raise an error when something else than a model has been returned

@@ -18,7 +18,7 @@
 from __future__ import absolute_import, division, print_function, with_statement
 
 from supercell.api.metatypes import (ContentType, MediaType, Return, Ok,
-                                     Error, OkCreated)
+                                     Error, OkCreated, NoContent)
 from supercell.api.requesthandler import RequestHandler
 from supercell.api.decorators import provides, consumes, async
 from supercell.api.cache import CacheConfig
@@ -39,6 +39,7 @@ __all__ = [
     'Return',
     'Ok',
     'OkCreated',
+    'NoContent',
     'Error',
     'Service',
     'HealthCheckOk',

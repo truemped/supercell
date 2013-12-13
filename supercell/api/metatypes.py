@@ -67,6 +67,12 @@ class OkCreated(Ok):
         super(OkCreated, self).__init__(201, additional=additional)
 
 
+class NoContent(Return):
+
+    def __init__(self):
+        super(NoContent, self).__init__(ReturnInformation(204))
+
+
 class Error(Return):
 
     def __init__(self, code=400, additional=None):
