@@ -1,6 +1,7 @@
 0.5.0 -
 ---------------------------
 
+- add a NoContent (204) http response
 - upgrade schematics to 0.9-4 (#7, #8)
 
 0.4.0 - (December 09, 2013)
