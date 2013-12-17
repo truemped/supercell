@@ -30,6 +30,7 @@ Authors
 In order of contribution:
 
 * Daniel Truemper `@truemped <http://twitter.com/truemped>`_
+* Marko Drotschmann `@themakodi <http://twitter.com/themakodi>`_
 * Tobias Guenther `@tobigue_ <http://twitter.com/tobigue_>`_
 
 
