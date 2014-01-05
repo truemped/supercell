@@ -42,7 +42,7 @@ if PY2:
     extras_require['futures'] = 'futures == 2.1.3'
 
 
-setup (
+setup(
     name='supercell',
     version='.'.join([str(v) for v in init.__version__]),
 
@@ -56,8 +56,8 @@ setup (
 
     install_requires=[
         'tornado >= 3.1.0',
-        'schematics == 0.9-4',
-        'scales == 1.0.3',
+        'schematics >= 0.9-4',
+        'scales >= 1.0.3',
     ],
 
     tests_require=tests_require,
