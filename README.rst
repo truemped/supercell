@@ -9,12 +9,19 @@ and querying the data. Only then *Tornado* request handlers are created and
 supercell will take care of transforming the incoming and outgoing
 serializations of the domain models.
 
-|TravisImage|_ |CoverAlls|_
+|TravisImage|_ |CoverAlls|_ |RequiresIo|_
 
 .. |TravisImage| image:: https://travis-ci.org/truemped/supercell.png?branch=master
-.. _TravisImage: https://travis-ci.org/truemped/supercell
+   :target: https://travis-ci.org/truemped/supercell
+   :alt: Test Status
+
 .. |CoverAlls| image:: https://coveralls.io/repos/truemped/supercell/badge.png?branch=master
-.. _CoverAlls: https://coveralls.io/r/truemped/supercell
+   :target: https://coveralls.io/r/truemped/supercell
+   :alt: Coverage Status
+
+.. |RequiresIo| image:: https://requires.io/github/truemped/supercell/requirements.png?branch=master
+   :target: https://requires.io/github/truemped/supercell/requirements/?branch=master
+   :alt: Requirements Status
 
 Quick Links
 ===========
