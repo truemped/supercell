@@ -12,16 +12,13 @@ serializations of the domain models.
 |TravisImage|_ |CoverAlls|_ |RequiresIo|_
 
 .. |TravisImage| image:: https://travis-ci.org/truemped/supercell.png?branch=master
-   :target: https://travis-ci.org/truemped/supercell
-   :alt: Test Status
+.. _TravisImage: https://travis-ci.org/truemped/supercell
 
 .. |CoverAlls| image:: https://coveralls.io/repos/truemped/supercell/badge.png?branch=master
-   :target: https://coveralls.io/r/truemped/supercell
-   :alt: Coverage Status
+.. _CoverAlls: https://coveralls.io/r/truemped/supercell
 
 .. |RequiresIo| image:: https://requires.io/github/truemped/supercell/requirements.png?branch=master
-   :target: https://requires.io/github/truemped/supercell/requirements/?branch=master
-   :alt: Requirements Status
+.. _RequiresIo: https://requires.io/github/truemped/supercell/requirements/?branch=master
 
 Quick Links
 ===========
