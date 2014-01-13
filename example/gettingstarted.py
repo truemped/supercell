@@ -51,7 +51,7 @@ class HelloWorld(s.RequestHandler):
         self.counter += 1
         name = self.get_argument('name', self.config.default_name)
         content = self.render_string(self.config.template, name=name)
-        raise s.Return(Saying(id=self.counter, content=content))
+        raise s.Return(Saying({'id': self.counter, 'content': content}))
 
 
 class MyService(s.Service):

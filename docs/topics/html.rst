@@ -21,7 +21,7 @@ A minimum example would look like this::
             return 'simple.html'
 
         def get(self, *args, **kwargs):
-            raise s.Return(Saying(id=self.counter, content=content))
+            raise s.Return(Saying({'id': self.counter, 'content': content}))
 
     class MyService(s.Service):
 
