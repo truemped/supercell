@@ -52,10 +52,10 @@ setup(
     license="http://www.apache.org/licenses/LICENSE-2.0",
 
     description='',
-    packages=['supercell', 'supercell.api', 'supercell.utils'],
+    packages=['supercell'],
 
     install_requires=[
-        'tornado >= 3.1.0',
+        'tornado >= 3.1.0, < 3.2',
         'schematics >= 0.9-4',
         'scales >= 1.0.3',
     ],
