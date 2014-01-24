@@ -24,15 +24,17 @@ to the environment::
 
         def run(self):
             self.environment.add_handler(...,
-                                         cache=CacheConfig(timedelta(minutes=10)),
-                                                expires=timedelta(minutes=10))
+                                         cache=CacheConfig(
+                                            timedelta(minutes=10),
+                                            expires=timedelta(minutes=10))
 
 The details of setting the `CacheControl` header are documented in the
 :func:`CacheConfig`. The `expires` argument simply takes a
 :func:`datetime.timedelta` as input and will then generate the `Expires` header
 based on the current time and the :func:`datetime.timedelta`.
 '''
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import namedtuple
 
@@ -44,6 +46,7 @@ CacheConfigT = namedtuple('CacheConfigT', ['max_age', 's_max_age', 'public',
                                            'private', 'no_cache', 'no_store',
                                            'must_revalidate',
                                            'proxy_revalidate'])
+
 
 def CacheConfig(max_age, s_max_age=None, public=False, private=False,
                 no_cache=False, no_store=False, must_revalidate=True,

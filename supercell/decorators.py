@@ -18,7 +18,8 @@
 '''Several decorators for using with :class:`supercell.api.RequestHandler`
 implementations.
 '''
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import defaultdict
 
@@ -45,8 +46,8 @@ def async(fn):
 
 
 def provides(content_type, vendor=None, version=None, default=False):
-    '''Class decorator for mapping HTTP GET responses to content types and their
-    representation.
+    '''Class decorator for mapping HTTP GET responses to content types and
+    their representation.
 
     In order to allow the **application/json** content type, create the handler
     class like this::
@@ -74,7 +75,7 @@ def provides(content_type, vendor=None, version=None, default=False):
     def wrapper(cls):
         '''The real class decorator.'''
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
-                'class decorator'
+            'class decorator'
 
         if not hasattr(cls, '_PROD_CONTENT_TYPES'):
             cls._PROD_CONTENT_TYPES = defaultdict(list)
@@ -114,9 +115,9 @@ def consumes(content_type, model, vendor=None, version=None):
     def wrapper(cls):
         '''The real decorator.'''
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
-                'class decorator'
+            'class decorator'
         assert model, 'In order to consume content a schematics model ' + \
-                'class has to be given via the model parameter'
+            'class has to be given via the model parameter'
 
         if not hasattr(cls, '_CONS_CONTENT_TYPES'):
             cls._CONS_CONTENT_TYPES = defaultdict(list)
@@ -129,5 +130,3 @@ def consumes(content_type, model, vendor=None, version=None):
         return cls
 
     return wrapper
-
-

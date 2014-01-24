@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import sys
 if sys.version_info > (2, 7):
@@ -33,7 +34,7 @@ import tornado.options
 from tornado.testing import AsyncHTTPTestCase
 
 import supercell.api as s
-from supercell.api.environment import Environment
+from supercell.environment import Environment
 
 
 class SimpleModel(Model):
@@ -131,7 +132,8 @@ class ApplicationIntegrationTest(AsyncHTTPTestCase):
         return service.get_app()
 
     def test_simple_get(self):
-        response = self.fetch('/test', headers={'Accept': s.MediaType.ApplicationJson})
+        response = self.fetch('/test', headers={'Accept':
+                                                s.MediaType.ApplicationJson})
         self.assertEqual(200, response.code)
         self.assertEqual('{"msg": "Holy moly"}', response.body)
 

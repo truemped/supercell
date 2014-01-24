@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from datetime import datetime
 from functools import partial
@@ -29,10 +30,10 @@ from tornado.util import bytes_type, unicode_type
 from tornado.web import RequestHandler as rq, HTTPError
 
 from supercell.api import MediaType
-from supercell.api.cache import compute_cache_header
-from supercell.api.metatypes import ReturnInformationT
-from supercell.api.consumer import ConsumerBase, NoConsumerFound
-from supercell.api.provider import ProviderBase, NoProviderFound
+from supercell.cache import compute_cache_header
+from supercell.mediatypes import ReturnInformationT
+from supercell.consumer import ConsumerBase, NoConsumerFound
+from supercell.provider import ProviderBase, NoProviderFound
 
 
 __all__ = ['RequestHandler']
@@ -52,13 +53,12 @@ def _decode_utf8_and_latin1(value):
         if isinstance(value, (unicode_type, type(None))):
             return value
         assert isinstance(value, bytes_type), \
-                'Expected bytes, unicode or None; got %s' % type(value)
+            'Expected bytes, unicode or None; got %s' % type(value)
         return value.decode('latin1')
 
 
 class RequestHandler(rq):
-    '''
-    **supercell** request handler.
+    '''**supercell** request handler.
 
     The only difference to the :class:`tornado.web.RequestHandler` is an
     adopted :func:`RequestHandler._execute_method()` method that will handle
@@ -127,7 +127,7 @@ class RequestHandler(rq):
                 # try to find a matching consumer
                 try:
                     (model, consumer_class) = ConsumerBase.map_consumer(
-                            headers['Content-Type'], self)
+                        headers['Content-Type'], self)
                     consumer = consumer_class()
                     kwargs['model'] = consumer.consume(self, model)
                 except NoConsumerFound:
@@ -173,7 +173,7 @@ class RequestHandler(rq):
         else:
             try:
                 provider_class = ProviderBase.map_provider(
-                        headers.get('Accept', ''), self, allow_default=True)
+                    headers.get('Accept', ''), self, allow_default=True)
             except NoProviderFound:
                 raise HTTPError(406)
 

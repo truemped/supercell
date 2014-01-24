@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from schematics.models import Model
 from schematics.types import StringType
@@ -26,7 +27,7 @@ from tornado.testing import AsyncHTTPTestCase
 
 import supercell.api as s
 from supercell.api import (RequestHandler, provides, consumes)
-from supercell.api.environment import Environment
+from supercell.environment import Environment
 
 
 class SimpleMessage(Model):
@@ -35,7 +36,7 @@ class SimpleMessage(Model):
     number = IntType()
 
     class Options:
-        serialize_when_none=False
+        serialize_when_none = False
 
 
 @provides(s.MediaType.ApplicationJson)
@@ -68,7 +69,6 @@ class MyEchoHandler(RequestHandler):
 
     @s.async
     def post(self, *args, **kwargs):
-        model = kwargs.get('model')
         # do something with model
         raise s.OkCreated({'docid': 123})
 
@@ -90,7 +90,8 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
         return IOLoop.instance()
 
     def test_simple_handler(self):
-        response = self.fetch('/test', headers={'Accept': s.MediaType.ApplicationJson})
+        response = self.fetch('/test', headers={'Accept':
+                                                s.MediaType.ApplicationJson})
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body,
                          '{"message": "A test", "doc_id": "test123"}')
@@ -107,19 +108,23 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
 
     def test_handler_with_missing_provider(self):
         response = self.fetch('/test', headers={'Accept':
-            'application/vnd.supercell+xml'})
+                                                'application/vnd.supercell+xml'
+                                                })
         self.assertEqual(response.code, 406)
 
     def test_post_handler(self):
         response = self.fetch('/test_post', method='POST',
-                              headers={'Content-Type': s.MediaType.ApplicationJson},
-                              body='{"message": "Simple message", "number": 1}')
+                              headers={'Content-Type':
+                                       s.MediaType.ApplicationJson},
+                              body='{"message": "Simple message", "number": 1}'
+                              )
         self.assertEqual(response.code, 201)
         self.assertEqual(response.body, '{"docid": 123, "ok": true}')
 
     def test_post_handler_with_wrong_value_type(self):
         response = self.fetch('/test_post', method='POST',
-                              headers={'Content-Type': s.MediaType.ApplicationJson},
+                              headers={'Content-Type':
+                                       s.MediaType.ApplicationJson},
                               body='{"number": "one"}')
         self.assertEqual(response.code, 400)
 
@@ -151,13 +156,13 @@ class TestUrlEncoding(AsyncHTTPTestCase):
     def test_latinone_handler(self):
         response = self.fetch('/testencoding/alfredo-p%e9rez-rubalcaba')
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' + \
+        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' +
                          'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
                          response.body)
 
     def test_utfeight_handler(self):
         response = self.fetch('/testencoding/alfredo-p%C3%A9rez-rubalcaba')
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' + \
+        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' +
                          'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
                          response.body)

@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import defaultdict
 
@@ -52,9 +53,12 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
@@ -70,9 +74,12 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
@@ -87,9 +94,12 @@ class TestConsumesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_CONS_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._CONS_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._CONS_CONTENT_TYPES)
-        content_type = MyHandler._CONS_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._CONS_CONTENT_TYPES)
+        content_type = MyHandler._CONS_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
         self.assertEqual(MyHandler._CONS_MODEL[content_type], object)
@@ -115,9 +125,12 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)
 
@@ -131,9 +144,12 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertEqual(content_type.vendor, 'ficture.light')
         self.assertEqual(content_type.version, 1.0)
 
@@ -147,8 +163,11 @@ class TestProvidesDecorator(TestCase):
 
         self.assertTrue(hasattr(MyHandler, '_PROD_CONTENT_TYPES'))
         self.assertEqual(len(MyHandler._PROD_CONTENT_TYPES), 1)
-        self.assertTrue(MediaType.ApplicationJson in MyHandler._PROD_CONTENT_TYPES)
-        content_type = MyHandler._PROD_CONTENT_TYPES[MediaType.ApplicationJson][0]
-        self.assertEqual(content_type.content_type, MediaType.ApplicationJson)
+        self.assertTrue(MediaType.ApplicationJson in
+                        MyHandler._PROD_CONTENT_TYPES)
+        content_type = MyHandler._PROD_CONTENT_TYPES[
+            MediaType.ApplicationJson][0]
+        self.assertEqual(content_type.content_type,
+                         MediaType.ApplicationJson)
         self.assertIsNone(content_type.vendor)
         self.assertIsNone(content_type.version)

@@ -15,14 +15,15 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 from collections import namedtuple
 
 from tornado import gen
 
 
 ContentTypeT = namedtuple('ContentType', ['content_type', 'vendor',
-                                         'version'])
+                                          'version'])
 
 
 def ContentType(content_type, vendor=None, version=None):

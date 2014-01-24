@@ -26,7 +26,8 @@ can also use it from within a request handler in and access managed objects,
 such as HTTP clients that can be used accross a number of client libraries for
 connection pooling, e.g.
 '''
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import namedtuple
 from datetime import timedelta
@@ -37,10 +38,10 @@ from greplin.scales import util
 
 from tornado.web import Application as _TAPP
 
-from supercell.api.cache import CacheConfigT
-from supercell.api.decorators import async
-from supercell.api.healthchecks import SystemHealthCheck
-from supercell.api.requesthandler import RequestHandler
+from supercell.cache import CacheConfigT
+from supercell.decorators import async
+from supercell.health import SystemHealthCheck
+from supercell.requesthandler import RequestHandler
 
 __all__ = ['Environment']
 
@@ -76,7 +77,7 @@ class Environment(object):
         self._finalized = False
 
     def add_handler(self, path, handler_class, init_dict=None, name=None,
-            host_pattern='.*$', cache=None, expires=None):
+                    host_pattern='.*$', cache=None, expires=None):
         '''Add a handler to the :class:`tornado.web.Application`.
 
         The environment will manage the available request handlers and managed
@@ -122,10 +123,10 @@ class Environment(object):
                           name=name, cache=cache, expires=expires)
         self._handlers.append(handler)
         if cache:
-            assert isinstance(cache, CacheConfigT), 'cache is not a CacheConfig'
+            assert isinstance(cache, CacheConfigT), 'cache not a CacheConfig'
             self._cache_infos[handler_class] = cache
         if expires:
-            assert isinstance(expires, timedelta), 'expires is not a timedelta'
+            assert isinstance(expires, timedelta), 'expires not a timedelta'
             self._expires_infos[handler_class] = expires
 
     def add_managed_object(self, name, instance):
@@ -198,7 +199,8 @@ class Environment(object):
             class MyService(s.Service):
 
                 def bootstrap(self):
-                    self.environment.config_file_paths.append('/etc/myservice/')
+                    self.environment.config_file_paths.append(
+                        '/etc/myservice/')
                     self.environment.config_file_paths.append('./etc/')
         '''
         if not hasattr(self, '_config_file_paths'):
@@ -233,8 +235,8 @@ class Environment(object):
             # add the custom health checks
             for check_name in self.health_checks:
                 check = self.health_checks[check_name]
-                self._app.add_handlers('.*', [('/_system/check/%s' % check_name,
-                                              check)])
+                self._app.add_handlers('.*', [
+                    ('/_system/check/%s' % check_name, check)])
 
             for handler in self._handlers:
                 if handler.init_dict:
@@ -256,7 +258,6 @@ class Environment(object):
         '''Return the `timedelta` for a specific handler that should define the
         `Expires` header for GET and HEAD requests.'''
         return self._expires_infos.get(handler, None)
-
 
     @property
     def config_name(self):

@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from functools import wraps
 import time
@@ -25,7 +26,7 @@ from greplin.scales.meter import MeterStat
 
 from tornado.concurrent import Future
 
-from supercell.api.requesthandler import RequestHandler
+from supercell.requesthandler import RequestHandler
 
 
 def latency(fn):
@@ -57,6 +58,7 @@ def latency(fn):
 
         if isinstance(self, RequestHandler):
             original_on_finish = self.on_finish
+
             def latency_on_finish(*args, **kwargs):
                 latency = time.time() - start
                 self._stats_latency[fn.__name__].addValue(latency)

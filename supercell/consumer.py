@@ -15,14 +15,15 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import defaultdict
 import json
 
 from supercell._compat import with_metaclass
 from supercell.api import ContentType, MediaType
-from supercell.utils import parse_accept_header
+from supercell.acceptparsing import parse_accept_header
 
 
 __all__ = ['NoConsumerFound', 'ConsumerBase', 'JsonConsumer']
@@ -50,7 +51,7 @@ class ConsumerMeta(type):
         if name != 'ConsumerBase' and hasattr(consumer_class, 'CONTENT_TYPE'):
             ct = consumer_class.CONTENT_TYPE
             ConsumerMeta.KNOWN_CONTENT_TYPES[ct.content_type].append(
-                    (ct, consumer_class))
+                (ct, consumer_class))
 
         return consumer_class
 

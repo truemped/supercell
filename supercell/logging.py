@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from logging import Formatter
 from logging.handlers import TimedRotatingFileHandler
@@ -30,8 +31,8 @@ class SupercellLoggingHandler(TimedRotatingFileHandler):
         TimedRotatingFileHandler.__init__(self, logfile, when='d',
                                           interval=1, backupCount=10)
         formatter = Formatter(' - '.join(['[%(asctime)s',
-                                        '%(relativeCreated).3f]',
-                                        '%(name)s',
-                                        '%(levelname)s',
-                                        '%(message)s']))
+                                          '%(relativeCreated).3f]',
+                                          '%(name)s',
+                                          '%(levelname)s',
+                                          '%(message)s']))
         self.setFormatter(formatter)

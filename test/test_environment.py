@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import sys
 if sys.version_info > (2, 7):
@@ -25,7 +26,7 @@ else:
 
 from tornado.web import Application, RequestHandler
 
-from supercell.api.environment import Environment
+from supercell.environment import Environment
 
 
 class EnvironmentTest(TestCase):
@@ -55,7 +56,8 @@ class EnvironmentTest(TestCase):
         app = env.get_application()
         self.assertEqual(len(app.handlers), 3)
         (host_pattern, [spec]) = [h for h in app.handlers
-                                  if not h[1][0].regex.pattern.startswith('/_system')][0]
+                                  if not h[1][0].regex.pattern.startswith(
+                                      '/_system')][0]
         self.assertEqual(host_pattern.pattern, '.*$')
         self.assertEqual(spec.regex.pattern, '/test$')
         self.assertEqual(spec.handler_class, MyHandler)

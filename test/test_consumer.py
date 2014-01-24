@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import sys
 if sys.version_info > (2, 7):
@@ -24,8 +25,9 @@ else:
     from unittest2 import TestCase
 
 from supercell.api import consumes, RequestHandler
-from supercell.api.metatypes import ContentType, MediaType
-from supercell.api.consumer import ConsumerBase, JsonConsumer, NoConsumerFound
+from supercell.mediatypes import ContentType, MediaType
+from supercell.consumer import (ConsumerBase, JsonConsumer,
+                                         NoConsumerFound)
 
 
 class MoreDetailedJsonConsumer(JsonConsumer):
@@ -63,7 +65,7 @@ class TestBasicConsumer(TestCase):
             pass
 
         (_, consumer) = ConsumerBase.map_consumer(
-                'application/json; encoding=UTF-8', handler=MyHandler)
+            'application/json; encoding=UTF-8', handler=MyHandler)
 
         self.assertIs(consumer, JsonConsumer)
 
@@ -78,7 +80,7 @@ class TestBasicConsumer(TestCase):
             pass
 
         (_, consumer) = ConsumerBase.map_consumer(
-                'application/vnd.supercell+json', handler=MyHandler)
+            'application/vnd.supercell+json', handler=MyHandler)
         self.assertIs(consumer, MoreDetailedJsonConsumer)
 
         with self.assertRaises(NoConsumerFound):
@@ -93,7 +95,7 @@ class TestBasicConsumer(TestCase):
             pass
 
         (_, consumer) = ConsumerBase.map_consumer(
-                'application/vnd.supercell-v1.0+json', handler=MyHandler)
+            'application/vnd.supercell-v1.0+json', handler=MyHandler)
         self.assertIs(consumer, JsonConsumerWithVendorAndVersion)
 
         with self.assertRaises(NoConsumerFound):

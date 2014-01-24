@@ -15,14 +15,15 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 
-from supercell.api.healthchecks import SystemHealthCheck
+from supercell.health import SystemHealthCheck
 import supercell.api as s
-from supercell.api.environment import Environment
+from supercell.environment import Environment
 
 
 class TestBasicHealthChecks(AsyncHTTPTestCase):
@@ -39,7 +40,8 @@ class TestBasicHealthChecks(AsyncHTTPTestCase):
         response = self.fetch('/_system/check')
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body,
-                '{"message": "API running", "code": "OK", "ok": true}')
+                         '{"message": "API running", "code": "OK", "ok": true}'
+                         )
 
 
 class SimpleHealthCheckExample(s.RequestHandler):

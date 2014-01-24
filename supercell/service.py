@@ -20,7 +20,8 @@ instanciate the :class:`supercell.api.Environment` and parse the configuration
 files as well as the command line. In the final step the
 :class:`tornado.web.Application` is created and bound to a socket.
 '''
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import logging
 import os
@@ -30,8 +31,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.options import define
 
-from supercell.api.environment import Environment
-from supercell.api.logging import SupercellLoggingHandler
+from supercell.environment import Environment
+from supercell.logging import SupercellLoggingHandler
 
 
 define('logfile', default='root.log', help='Filename to store the logs')

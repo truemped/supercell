@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import sys
 if sys.version_info > (2, 7):
@@ -24,8 +25,9 @@ else:
     from unittest2 import TestCase
 
 from supercell.api import provides, RequestHandler
-from supercell.api.metatypes import ContentType, MediaType
-from supercell.api.provider import ProviderBase, JsonProvider, NoProviderFound
+from supercell.mediatypes import ContentType, MediaType
+from supercell.provider import (ProviderBase, JsonProvider,
+                                         NoProviderFound)
 
 
 class MoreDetailedJsonProvider(JsonProvider):
@@ -76,12 +78,10 @@ class TestBasicProvider(TestCase):
                 pass
 
         provider = ProviderBase.map_provider(
-                'application/vnd.supercell-v1.0+json',
-                handler=MyHandler)
+            'application/vnd.supercell-v1.0+json', handler=MyHandler)
         self.assertIs(provider, JsonProviderWithVendorAndVersion)
 
         handler = MyHandler()
         provider = ProviderBase.map_provider(
-                'application/vnd.supercell-v1.0+json',
-                handler=handler)
+            'application/vnd.supercell-v1.0+json', handler=handler)
         self.assertIs(provider, JsonProviderWithVendorAndVersion)

@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import json
 
@@ -27,8 +28,8 @@ from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 
 import supercell.api as s
-from supercell.api.environment import Environment
-from supercell.api.environment import ScalesSupercellHandler
+from supercell.environment import Environment
+from supercell.environment import ScalesSupercellHandler
 
 
 class SimpleMessage(Model):
@@ -90,8 +91,8 @@ class TestSupercellStats(AsyncHTTPTestCase):
         response = self.fetch('/_system/stats/teststats')
         self.assertEqual(response.code, 200)
         expected = '{"latency": {"_long_method": {"count": 1}, "get":' + \
-                ' {"count": 1}}, "_long_method": {"count": 1, "unit":' + \
-                ' "per second"}}'
+                   ' {"count": 1}}, "_long_method": {"count": 1, "unit":' + \
+                   ' "per second"}}'
         self.assertEqual(response.body, expected)
 
         response = self.fetch('/teststats')
@@ -107,5 +108,7 @@ class TestSupercellStats(AsyncHTTPTestCase):
         response = self.fetch('/_system/stats/')
         self.assertEqual(response.code, 200)
         result = json.loads(response.body)
-        self.assertEqual(result['_internal']['test_stats']['MyTestObject']['do_something']['count'], 2)
-        self.assertEqual(result['_internal']['test_stats']['MyTestObject']['latency']['do_something']['count'], 2)
+        self.assertEqual(result['_internal']['test_stats']['MyTestObject']
+                         ['do_something']['count'], 2)
+        self.assertEqual(result['_internal']['test_stats']['MyTestObject']
+                         ['latency']['do_something']['count'], 2)

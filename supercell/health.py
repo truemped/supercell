@@ -63,11 +63,12 @@ and an error a similar one::
     $ curl 'http://127.0.0.1/_system/check/http_resource_with_warning'
     {"code": "ERROR", "error": true}
 '''
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
-from supercell.api.decorators import provides, async
-from supercell.api.metatypes import Ok, Error, MediaType
-from supercell.api.requesthandler import RequestHandler
+from supercell.decorators import provides, async
+from supercell.mediatypes import Ok, Error, MediaType
+from supercell.requesthandler import RequestHandler
 
 
 class HealthCheckOk(Ok):
@@ -109,7 +110,7 @@ class HealthCheckError(Error):
         additional = additional or {}
         additional['code'] = 'ERROR'
         super(HealthCheckError, self).__init__(code=500,
-                                                 additional=additional)
+                                               additional=additional)
 
 
 @provides(MediaType.ApplicationJson, default=True)

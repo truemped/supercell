@@ -17,12 +17,6 @@
 #
 from datetime import datetime, timedelta
 
-import sys
-if sys.version_info > (2, 7):
-    from unittest import TestCase
-else:
-    from unittest2 import TestCase
-
 from schematics.models import Model
 from schematics.types import StringType
 
@@ -32,7 +26,7 @@ from tornado.testing import AsyncHTTPTestCase
 
 import supercell.api as s
 from supercell.api import (RequestHandler, provides, CacheConfig)
-from supercell.api.environment import Environment
+from supercell.environment import Environment
 
 
 class SimpleMessage(Model):
@@ -65,6 +59,7 @@ class MyPrivateCaching(RequestHandler):
     def get(self, *args, **kwargs):
         raise s.Return(SimpleMessage({"doc_id": 'test123',
                                       "message": 'A test'}))
+
 
 @provides(s.MediaType.ApplicationJson, default=True)
 class CachingWithYielding(RequestHandler):
@@ -130,8 +125,8 @@ class TestCacheDecorator(AsyncHTTPTestCase):
         response = self.fetch('/cache')
         self.assertEqual(response.code, 200)
         self.assertTrue('Cache-Control' in response.headers)
-        self.assertEqual('max-age=600, s-max-age=600, public, ' + \
-                            'must-revalidate, proxy-revalidate',
+        self.assertEqual('max-age=600, s-max-age=600, public, ' +
+                         'must-revalidate, proxy-revalidate',
                          response.headers['Cache-Control'])
 
         self.assertTrue('Expires' in response.headers)

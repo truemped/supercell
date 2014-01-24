@@ -15,13 +15,14 @@
 # limitations under the License.
 #
 #
-from __future__ import absolute_import, division, print_function, with_statement
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 from collections import defaultdict
 
 from supercell._compat import with_metaclass
 from supercell.api import ContentType, MediaType
-from supercell.utils import parse_accept_header
+from supercell.acceptparsing import parse_accept_header
 
 
 __all__ = ['NoProviderFound', 'ProviderBase', 'JsonProvider']
@@ -49,7 +50,7 @@ class ProviderMeta(type):
         if name != 'ProviderBase' and hasattr(provider_class, 'CONTENT_TYPE'):
             ct = provider_class.CONTENT_TYPE
             ProviderMeta.KNOWN_CONTENT_TYPES[ct.content_type].append(
-                    (ct, provider_class))
+                (ct, provider_class))
 
         return provider_class
 

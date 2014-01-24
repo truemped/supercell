@@ -4,12 +4,13 @@
 #
 from unittest import TestCase
 
-from supercell.utils.acceptparsing import parse_accept_header
+from supercell.acceptparsing import parse_accept_header
 
 
 class TestParseAcceptHeader(TestCase):
     def test_parse_accept_header_browser(self):
-        accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/json"
+        accept = ("text/html,application/xhtml+xml,application/xml;" +
+                  "q=0.9,*/*;q=0.8,application/json")
         should = [('text/html', {}, 1.0),
                   ('application/xhtml+xml', {}, 1.0),
                   ('application/json', {}, 1.0),
