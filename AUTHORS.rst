@@ -8,3 +8,5 @@ In the list of contributing to the codebase:
 - Marko Drotschmann < drotschmann at retresco de >
 
 - Tobias Guenther < tobias.guenther at retresco de >
+
+- Matthias Rebel < matthias.rebel at retresco de >
