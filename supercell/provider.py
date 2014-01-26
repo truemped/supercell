@@ -142,3 +142,16 @@ class JsonProvider(ProviderBase):
         '''
         model.validate()
         handler.write(model.to_primitive())
+
+
+class TornadoTemplateProvider(ProviderBase):
+    '''Default provider for `text/html`.'''
+
+    CONTENT_TYPE = ContentType(MediaType.TextHtml)
+
+    def provide(self, model, handler):
+        '''Render a template with the given model into HTML.
+
+        By default we will use the tornado built in template language.'''
+        model.validate()
+        handler.render(handler.get_template(model), **model.to_primitive())

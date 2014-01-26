@@ -18,6 +18,8 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+import os.path as op
+
 from schematics.models import Model
 from schematics.types import StringType
 from schematics.types import IntType
@@ -166,3 +168,68 @@ class TestUrlEncoding(AsyncHTTPTestCase):
         self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' +
                          'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
                          response.body)
+
+
+class TestSimpleHtmlHandler(AsyncHTTPTestCase):
+
+    def get_app(self):
+
+        @provides(s.MediaType.TextHtml, default=True)
+        class SimpleHtmlHandler(s.RequestHandler):
+
+            def get_template(self, model):
+                return 'test.html'
+
+            @s.async
+            def get(self, *args, **kwargs):
+                r = SimpleMessage({'doc_id': 'test123',
+                                   'message': 'args=%s; kwargs=%s' % (args,
+                                                                      kwargs)})
+                raise s.Return(r)
+
+        env = Environment()
+        env.add_handler('/test_html/(.*)', SimpleHtmlHandler)
+        d = op.dirname(__file__)
+        env.tornado_settings['template_path'] = op.join(d,
+                                                        'html_test_template')
+        return env.get_application()
+
+    def get_new_ioloop(self):
+        return IOLoop.instance()
+
+    def test_simple_html(self):
+        response = self.fetch('/test_html/')
+        self.assertEqual(200, response.code)
+        exp_html = ("<html>\n<head><title>Test</title></head>\n" +
+                    "<body>\ndoc_id: test123\nmessage: args=(u'',); " +
+                    "kwargs={}\n</body>\n</html>\n")
+        self.assertEqual(exp_html, response.body)
+
+
+class TestSimpleHtmlHandlerWithMissingTemplate(AsyncHTTPTestCase):
+
+    def get_app(self):
+
+        @provides(s.MediaType.TextHtml, default=True)
+        class SimpleHtmlHandler(s.RequestHandler):
+
+            @s.async
+            def get(self, *args, **kwargs):
+                r = SimpleMessage({'doc_id': 'test123',
+                                   'message': 'args=%s; kwargs=%s' % (args,
+                                                                      kwargs)})
+                raise s.Return(r)
+
+        env = Environment()
+        env.add_handler('/test_html/(.*)', SimpleHtmlHandler)
+        d = op.dirname(__file__)
+        env.tornado_settings['template_path'] = op.join(d,
+                                                        'html_test_template')
+        return env.get_application()
+
+    def get_new_ioloop(self):
+        return IOLoop.instance()
+
+    def test_simple_html(self):
+        response = self.fetch('/test_html/')
+        self.assertEqual(500, response.code)

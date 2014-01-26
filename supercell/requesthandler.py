@@ -112,6 +112,11 @@ class RequestHandler(rq):
             " (ip:" + self.request.remote_ip + ", r_id:" + \
             str(self.request_id) + ")"
 
+    def get_template(self, model):
+        '''Method to determine which template to use for rendering the html.
+        '''
+        raise NotImplemented
+
     def _execute_method(self):
         '''Execute the request.
 
