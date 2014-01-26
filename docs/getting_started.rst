@@ -124,7 +124,7 @@ Request Handler
 The request handler is very similar to a `Tornado` handler, except it also takes
 care of de-/serializing in- and output::
 
-    @s.produces(s.MediaType.ApplicationJson)
+    @s.provides(s.MediaType.ApplicationJson)
     class HelloWorld(s.RequestHandler):
 
         @property
@@ -144,7 +144,7 @@ care of de-/serializing in- and output::
             content = self.render_string(self.config.template, name)
             raise s.Return(Saying(id=self.counter, content=content))
 
-Ok, let's get through this example step by step. The `s.produces` decorator
+Ok, let's get through this example step by step. The `s.provides` decorator
 tells supercell the content type, that this handler should return. In this case
 a predefined one (`s.MediaType.ApplicationJson`) that will transform the
 returned model as `application/json`.

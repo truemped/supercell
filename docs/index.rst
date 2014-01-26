@@ -18,7 +18,7 @@ A very simple example for a supercell request handler looks like this::
         id = IntType()
         content = StringType()
 
-    @s.produces(s.MediaType.ApplicationJson)
+    @s.provides(s.MediaType.ApplicationJson)
     class HelloWorld(s.RequestHandler):
 
         @property

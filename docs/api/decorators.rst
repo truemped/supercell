@@ -5,5 +5,5 @@
 Decorators
 ----------
 
-.. automodule:: supercell.api.decorators
+.. automodule:: supercell.decorators
     :members:

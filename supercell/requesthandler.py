@@ -29,9 +29,8 @@ from tornado.escape import to_unicode
 from tornado.util import bytes_type, unicode_type
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.api import MediaType
 from supercell.cache import compute_cache_header
-from supercell.mediatypes import ReturnInformationT
+from supercell.mediatypes import MediaType, ReturnInformationT
 from supercell.consumer import ConsumerBase, NoConsumerFound
 from supercell.provider import ProviderBase, NoProviderFound
 

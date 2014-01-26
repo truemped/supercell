@@ -21,7 +21,7 @@ from __future__ import (absolute_import, division, print_function,
 from collections import defaultdict
 
 from supercell._compat import with_metaclass
-from supercell.api import ContentType, MediaType
+from supercell.mediatypes import ContentType, MediaType
 from supercell.acceptparsing import parse_accept_header
 
 
