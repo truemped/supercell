@@ -5,5 +5,5 @@
 Service
 -------
 
-.. automodule:: supercell.api.service
+.. automodule:: supercell.service
     :members:

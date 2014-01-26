@@ -5,5 +5,5 @@
 Request handler
 ---------------
 
-.. automodule:: supercell.api.requesthandler
+.. automodule:: supercell.requesthandler
     :members:

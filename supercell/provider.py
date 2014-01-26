@@ -21,7 +21,7 @@ from __future__ import (absolute_import, division, print_function,
 from collections import defaultdict
 
 from supercell._compat import with_metaclass
-from supercell.api import ContentType, MediaType
+from supercell.mediatypes import ContentType, MediaType
 from supercell.acceptparsing import parse_accept_header
 
 
@@ -142,3 +142,16 @@ class JsonProvider(ProviderBase):
         '''
         model.validate()
         handler.write(model.to_primitive())
+
+
+class TornadoTemplateProvider(ProviderBase):
+    '''Default provider for `text/html`.'''
+
+    CONTENT_TYPE = ContentType(MediaType.TextHtml)
+
+    def provide(self, model, handler):
+        '''Render a template with the given model into HTML.
+
+        By default we will use the tornado built in template language.'''
+        model.validate()
+        handler.render(handler.get_template(model), **model.to_primitive())

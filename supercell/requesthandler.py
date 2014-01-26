@@ -29,9 +29,8 @@ from tornado.escape import to_unicode
 from tornado.util import bytes_type, unicode_type
 from tornado.web import RequestHandler as rq, HTTPError
 
-from supercell.api import MediaType
 from supercell.cache import compute_cache_header
-from supercell.mediatypes import ReturnInformationT
+from supercell.mediatypes import MediaType, ReturnInformationT
 from supercell.consumer import ConsumerBase, NoConsumerFound
 from supercell.provider import ProviderBase, NoProviderFound
 
@@ -111,6 +110,11 @@ class RequestHandler(rq):
         return self.request.method + " " + self.request.uri + \
             " (ip:" + self.request.remote_ip + ", r_id:" + \
             str(self.request_id) + ")"
+
+    def get_template(self, model):
+        '''Method to determine which template to use for rendering the html.
+        '''
+        raise NotImplemented
 
     def _execute_method(self):
         '''Execute the request.

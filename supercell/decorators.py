@@ -26,7 +26,7 @@ from collections import defaultdict
 from tornado import gen
 from tornado.web import asynchronous
 
-from supercell.api import ContentType
+from supercell.mediatypes import ContentType
 
 
 def async(fn):

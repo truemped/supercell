@@ -5,5 +5,5 @@
 Caching
 -------
 
-.. automodule:: supercell.api.cache
+.. automodule:: supercell.cache
    :members:

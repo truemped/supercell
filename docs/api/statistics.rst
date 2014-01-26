@@ -5,5 +5,5 @@
 Statistics
 ----------
 
-.. automodule:: supercell.api.stats
+.. automodule:: supercell.stats
    :members:

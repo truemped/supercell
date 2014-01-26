@@ -38,6 +38,9 @@ class MediaType(object):
     ApplicationJson = 'application/json'
     '''Content type for `application/json`'''
 
+    TextHtml = 'text/html'
+    '''Content type for `text/html`'''
+
 
 ReturnInformationT = namedtuple('ReturnInformation', ['code', 'message'])
 

@@ -3,6 +3,7 @@
 
 - add a NoContent (204) http response
 - upgrade schematics to 0.9-4 (#7, #8)
+- add a text/html provider for rendering html using tornado.template
 
 0.4.0 - (December 09, 2013)
 ---------------------------

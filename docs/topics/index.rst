@@ -8,5 +8,6 @@ Topics
    :maxdepth: 1
 
    logging
+   html
    consumer
    provider

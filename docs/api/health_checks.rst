@@ -5,5 +5,5 @@
 Health Checks
 -------------
 
-.. automodule:: supercell.api.healthchecks
+.. automodule:: supercell.health
     :members:

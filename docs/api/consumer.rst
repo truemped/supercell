@@ -5,7 +5,7 @@
 Consumer
 --------
 
-.. automodule:: supercell.api.consumer
+.. automodule:: supercell.consumer
     :members:
 
 

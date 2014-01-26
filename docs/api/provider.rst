@@ -5,5 +5,5 @@
 Provider
 --------
 
-.. automodule:: supercell.api.provider
+.. automodule:: supercell.provider
     :members:

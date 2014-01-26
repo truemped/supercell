@@ -5,5 +5,5 @@
 Environment
 -----------
 
-.. automodule:: supercell.api.environment
+.. automodule:: supercell.environment
     :members:
