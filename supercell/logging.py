@@ -20,6 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 
 from logging import Formatter
 from logging.handlers import TimedRotatingFileHandler
+import os
 
 
 class SupercellLoggingHandler(TimedRotatingFileHandler):
@@ -28,6 +29,7 @@ class SupercellLoggingHandler(TimedRotatingFileHandler):
 
     def __init__(self, logfile):
         '''Initialize the :class:`TimedRotatingFileHandler`.'''
+        logfile = logfile % {'pid': os.getpid()}
         TimedRotatingFileHandler.__init__(self, logfile, when='d',
                                           interval=1, backupCount=10)
         formatter = Formatter(' - '.join(['[%(asctime)s',

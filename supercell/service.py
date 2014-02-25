@@ -35,7 +35,9 @@ from supercell.environment import Environment
 from supercell.logging import SupercellLoggingHandler
 
 
-define('logfile', default='root.log', help='Filename to store the logs')
+define('logfile', default='root-%(pid)s.log',
+       help='Filename to store the logs. If the name contains "%%(pid)s" ' +
+       'it will be replaced with the pid.')
 
 
 define('loglevel', default='INFO', help='Log level')
@@ -50,7 +52,7 @@ define('address', default='127.0.0.1', help='Address to bind on')
 define('socketfd', default=None, help='Filedescriptor used from circus')
 
 
-define('debug', default=False, help='If set, tornado is started in debug mode')
+define('debug', default=False, help='If set, Tornado is started in debug mode')
 
 
 define('show_config_file_order', default=False,
