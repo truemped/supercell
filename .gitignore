@@ -40,6 +40,9 @@ coverage.xml
 ######
 *.swp
 *.swo
+.ropeproject
+
+.idea
 
 ######
 # docs
@@ -47,4 +50,7 @@ coverage.xml
 docs/doctrees
 docs/html
 
-root.log
+######
+# logs
+######
+root.log*
