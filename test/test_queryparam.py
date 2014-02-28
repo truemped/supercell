@@ -30,7 +30,7 @@ from tornado.testing import AsyncHTTPTestCase
 import supercell.api as s
 from supercell.api import RequestHandler, provides
 from supercell.environment import Environment
-from supercell.queryparam import QueryParams, Param
+from supercell.queryparam import QueryParams
 
 
 class SimpleMessage(Model):
@@ -47,12 +47,27 @@ class MyQueryparamHandler(RequestHandler):
 
     @s.async
     @QueryParams((
-        Param('docid', IntType(min_value=1, max_value=2, required=False)),
-        Param('message', StringType(required=True))
+        ('docid', IntType(min_value=1, max_value=2, required=False)),
+        ('message', StringType(required=True))
     ))
     def get(self, *args, **kwargs):
-        raise s.Return(SimpleMessage({"doc_id": kwargs.get('docid', 5),
-                                      "message": kwargs.get('message')}))
+        query = kwargs.get('query')
+        raise s.Return(SimpleMessage({"doc_id": query.get('docid', 5),
+                                      "message": query.get('message')}))
+
+
+@provides(s.MediaType.ApplicationJson, default=True)
+class MyQueryparamHandlerWithCustomKwargsName(RequestHandler):
+
+    @s.async
+    @QueryParams((
+        ('docid', IntType(min_value=1, max_value=2, required=False)),
+        ('message', StringType(required=True))
+    ), kwargs_name='really_my_name')
+    def get(self, *args, **kwargs):
+        query = kwargs.get('really_my_name')
+        raise s.Return(SimpleMessage({"doc_id": query.get('docid', 5),
+                                      "message": query.get('message')}))
 
 
 @pytest.mark.onlyme
@@ -86,3 +101,12 @@ class TestSimpleQueryParam(AsyncHTTPTestCase):
         self.assertEqual(400, response.code)
         self.assertEqual('{"docid": ["Value is not int"], "error": true}',
                          response.body)
+
+
+class TestSimpleQueryParamWithCustomKwargsName(TestSimpleQueryParam):
+
+    def get_app(self):
+        env = Environment()
+        env.add_handler('/test', MyQueryparamHandlerWithCustomKwargsName)
+        env.tornado_settings['debug'] = True
+        return env.get_application()

@@ -19,7 +19,6 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-from collections import namedtuple
 import functools
 
 from schematics.exceptions import ConversionError, ValidationError
@@ -27,10 +26,7 @@ from schematics.exceptions import ConversionError, ValidationError
 from supercell.api import Error
 
 
-Param = namedtuple('Param', ['name', 'type'])
-
-
-def QueryParams(params):
+def QueryParams(params, kwargs_name='query'):
     """Simple decorator for ensuring types in query parameters.
 
     @QueryParams((
@@ -50,11 +46,12 @@ def QueryParams(params):
             :param s: the handler itself
             """
 
+            kwargs[kwargs_name] = q = {}
             for (name, typedef) in params:
                 if s.get_argument(name, None):
                     try:
                         parsed = typedef(s.get_argument(name))
-                        kwargs[name] = parsed
+                        q[name] = parsed
                     except (ConversionError, ValidationError) as e:
                         validation_errors = {name: e.messages}
                         raise Error(additional=validation_errors)
