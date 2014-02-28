@@ -3,6 +3,7 @@
 
 - Enable log file name with pid
 - General base class for middleware decorators
+- Typed query params deal with validation of query params
 
 0.5.0 -
 ---------------------------

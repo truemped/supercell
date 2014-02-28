@@ -14,6 +14,7 @@ This is the main `supercell` API reference.
     request_handler
     consumer
     provider
+    queryparams
     decorators
     health_checks
     statistics
