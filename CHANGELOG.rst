@@ -1,3 +1,9 @@
+0.6.0 -
+---------------------------
+
+- Enable log file name with pid
+- General base class for middleware decorators
+
 0.5.0 -
 ---------------------------
 

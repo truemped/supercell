@@ -33,6 +33,7 @@ from supercell.provider import ProviderBase, JsonProvider
 from supercell.requesthandler import RequestHandler
 from supercell.service import Service
 from supercell.stats import latency, metered
+from supercell.middleware import Middleware
 
 
 __all__ = [
@@ -59,5 +60,6 @@ __all__ = [
     'JsonProvider',
     'RequestHandler',
     'Return',
-    'Service'
+    'Service',
+    'Middleware'
 ]
