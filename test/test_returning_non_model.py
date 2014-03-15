@@ -33,16 +33,17 @@ from supercell.api import Service
 
 
 @provides('application/json', default=True)
-class TestHandler(RequestHandler):
+class MyHandler(RequestHandler):
+
     @async
     def get(self):
         raise Return({"this": "is not returned"})
 
 
-class TestService(Service):
+class MyService(Service):
     def run(self):
         env = self.environment
-        env.add_handler('/test', TestHandler, {})
+        env.add_handler('/test', MyHandler, {})
 
 
 class ApplicationIntegrationTest(AsyncHTTPTestCase):
@@ -55,7 +56,7 @@ class ApplicationIntegrationTest(AsyncHTTPTestCase):
         return IOLoop.instance()
 
     def get_app(self):
-        service = TestService()
+        service = MyService()
         service.initialize_logging()
         return service.get_app()
 
