@@ -28,7 +28,7 @@ PY2 = sys.version_info[0] == 2
 tests_require = [
     'mock',
     'pytest',
-    'pytest-cov',
+    'pytest-cov'
 ]
 
 if sys.version_info < (2, 7):
@@ -55,9 +55,9 @@ setup(
     packages=['supercell'],
 
     install_requires=[
-        'tornado >= 3.1.0, < 3.2',
+        'tornado >= 3.1.0, <= 3.2.0',
         'schematics >= 0.9-4',
-        'scales >= 1.0.3',
+        'scales >= 1.0.3'
     ],
 
     tests_require=tests_require,

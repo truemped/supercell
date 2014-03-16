@@ -183,8 +183,7 @@ class TestSimpleHtmlHandler(AsyncHTTPTestCase):
             @s.async
             def get(self, *args, **kwargs):
                 r = SimpleMessage({'doc_id': 'test123',
-                                   'message': 'args=%s; kwargs=%s' % (args,
-                                                                      kwargs)})
+                                   'message': 'bliblablup'})
                 raise s.Return(r)
 
         env = Environment()
@@ -201,8 +200,9 @@ class TestSimpleHtmlHandler(AsyncHTTPTestCase):
         response = self.fetch('/test_html/')
         self.assertEqual(200, response.code)
         exp_html = ("<html>\n<head><title>Test</title></head>\n" +
-                    "<body>\ndoc_id: test123\nmessage: args=(u'',); " +
-                    "kwargs={}\n</body>\n</html>\n")
+                    "<body>\ndoc_id: test123\nmessage: bliblablup\n" +
+                    "</body>\n</html>\n")
+        assert exp_html == response.body
         self.assertEqual(exp_html, response.body)
 
 
