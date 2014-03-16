@@ -66,7 +66,8 @@ and an error a similar one::
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-from supercell.decorators import provides, async
+from supercell.api import async
+from supercell.decorators import provides
 from supercell.mediatypes import Ok, Error, MediaType
 from supercell.requesthandler import RequestHandler
 

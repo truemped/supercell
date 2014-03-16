@@ -23,26 +23,7 @@ from __future__ import (absolute_import, division, print_function,
 
 from collections import defaultdict
 
-from tornado import gen
-from tornado.web import asynchronous
-
 from supercell.mediatypes import ContentType
-
-
-def async(fn):
-    '''Decorator that merges the :func:`tornado.web.asynchronous` as well as
-    the :func:`tornado.gen.coroutine` decorators.
-
-    Example::
-
-        class MyHandler(s.RequestHandler):
-
-            @s.async
-            def get(self, user_id):
-                # ...
-                raise s.Return(User())
-    '''
-    return asynchronous(gen.coroutine(fn))
 
 
 def provides(content_type, vendor=None, version=None, default=False):

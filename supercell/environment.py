@@ -38,8 +38,8 @@ from greplin.scales import util
 
 from tornado.web import Application as _TAPP
 
+from supercell.api import async
 from supercell.cache import CacheConfigT
-from supercell.decorators import async
 from supercell.health import SystemHealthCheck
 from supercell.requesthandler import RequestHandler
 

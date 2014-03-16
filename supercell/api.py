@@ -18,10 +18,13 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+from tornado.gen import coroutine
+async = coroutine
+
 from supercell.cache import CacheConfig
 from supercell.mediatypes import (ContentType, MediaType, Return, Ok, Error,
                                   OkCreated, NoContent)
-from supercell.decorators import provides, consumes, async
+from supercell.decorators import provides, consumes
 from supercell.environment import Environment
 from supercell.health import (HealthCheckOk, HealthCheckWarning,
                               HealthCheckError)
@@ -34,6 +37,7 @@ from supercell.stats import latency, metered
 
 __all__ = [
     'async',
+    'coroutine',
     'consumes',
     'latency',
     'metered',
