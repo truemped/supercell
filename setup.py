@@ -35,11 +35,18 @@ if sys.version_info < (2, 7):
     tests_require.append('unittest2')
 
 
+requires = [
+    'tornado >= 3.1.0, <= 3.2.0',
+    'schematics >= 0.9-4',
+    'scales >= 1.0.3'
+]
+if PY2:
+    requires.append('futures')
+
+
 extras_require = {}
 extras_require['test'] = tests_require
-extras_require['futures'] = ''
-if PY2:
-    extras_require['futures'] = 'futures == 2.1.3'
+extras_require['etcd'] = ['python-etcd']
 
 
 setup(
@@ -54,11 +61,7 @@ setup(
     description='',
     packages=['supercell'],
 
-    install_requires=[
-        'tornado >= 3.1.0, <= 3.2.0',
-        'schematics >= 0.9-4',
-        'scales >= 1.0.3'
-    ],
+    install_requires=requires,
 
     tests_require=tests_require,
     extras_require=extras_require,
