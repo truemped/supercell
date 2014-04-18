@@ -1,6 +1,7 @@
 0.6.0 -
 ---------------------------
 
+- add graceful shutdown
 - allow logging to `stdout`
 - Enable log file name with pid
 - General base class for middleware decorators

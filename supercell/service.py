@@ -26,7 +26,9 @@ from __future__ import (absolute_import, division, print_function,
 import logging
 from logging import Formatter, StreamHandler
 import os
+import signal
 import sys
+import time
 
 import tornado.options
 from tornado.httpserver import HTTPServer
@@ -53,6 +55,11 @@ define('address', default='127.0.0.1', help='Address to bind on')
 
 
 define('socketfd', default=None, help='Filedescriptor used from circus')
+
+
+define('max_grace_seconds', default=3,
+       help='Wait up to this amount of seconds to finish requests before ' +
+       'shutdown')
 
 
 define('debug', default=False, help='If set, Tornado is started in debug mode')
@@ -90,19 +97,47 @@ class Service(object):
         '''
         app = self.get_app()
 
-        server = HTTPServer(app)
+        self.server = HTTPServer(app)
 
         if self.config.socketfd:
             import socket
             sock = socket.fromfd(int(self.config.socketfd), socket.AF_INET,
                                  socket.SOCK_STREAM)
-            server.add_socket(sock)
+            self.server.add_socket(sock)
         else:
-            server.bind(self.config.port, address=self.config.address)
-            server.start(1)
+            self.server.bind(self.config.port, address=self.config.address)
+            self.server.start(1)
+
+        def sig_handler(sig, frame):
+            IOLoop.instance().add_callback(self.shutdown)
+        signal.signal(signal.SIGTERM, sig_handler)
+        signal.signal(signal.SIGINT, sig_handler)
 
         self.slog.info('Starting supercell')
         IOLoop.instance().start()
+
+    def shutdown(self):
+        """Gaceful shutdown of the server.
+
+        In this method we stop the `tornado.httpserver` in order to stop
+        accepting new connections. During a period of `max_grace_seconds`
+        current requests are allowed to finish. After this period the `IOLoop`
+        is stopped.
+        """
+        io_loop = IOLoop.instance()
+        self.slog.info('Stopping HTTP server')
+        self.server.stop()
+
+        dl = time.time() + self.config.max_grace_seconds
+
+        def stop_loop():
+            now = time.time()
+            if now < dl and (io_loop._callbacks or io_loop._timeouts):
+                io_loop.add_timeout(now + 1, stop_loop)
+            else:
+                io_loop.stop()
+                self.slog.info('Shutdown')
+        stop_loop()
 
     def get_app(self):
         '''Create the :class:`tornado.web.Appliaction` instance and return it.
