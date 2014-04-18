@@ -24,6 +24,8 @@ if sys.version_info > (2, 7):
 else:
     from unittest2 import TestCase
 
+import socket
+
 import mock
 import pytest
 
@@ -114,7 +116,64 @@ class ServiceTest(TestCase):
         service = MyService()
         service.main()
 
-        self.assertEqual(len(ioloop_instance_mock.mock_calls), 4)
+        expected = [mock.call(), mock.call().add_handler(mock.ANY, mock.ANY,
+                                                         mock.ANY),
+                    mock.call(), mock.call().start()]
+        assert expected == ioloop_instance_mock.mock_calls
+
+    @mock.patch('tornado.ioloop.IOLoop.instance')
+    @mock.patch('socket.fromfd')
+    def test_startup_with_socket_fd(self, socket_fromfd_mock,
+                                    ioloop_instance_mock):
+
+        service = MyService()
+        service.config.socketfd = '123'
+
+        service.main()
+
+        expected = [mock.call(), mock.call().add_handler(mock.ANY, mock.ANY,
+                                                         mock.ANY),
+                    mock.call(), mock.call().start()]
+        assert expected == ioloop_instance_mock.mock_calls
+
+        assert (mock.call(123, socket.AF_INET, socket.SOCK_STREAM)
+                in socket_fromfd_mock.mock_calls)
+
+    @mock.patch('tornado.ioloop.IOLoop.instance')
+    def test_graceful_shutdown_pending_callbacks(self, ioloop_instance_mock):
+        service = MyService()
+        service.main()
+
+        expected = [mock.call(), mock.call().add_handler(mock.ANY, mock.ANY,
+                                                         mock.ANY),
+                    mock.call(), mock.call().start()]
+        assert expected == ioloop_instance_mock.mock_calls
+
+        service.shutdown()
+
+        expected.extend([mock.call(), mock.call().remove_handler(mock.ANY),
+                         mock.call()._callbacks.__nonzero__(),
+                         mock.call().add_timeout(mock.ANY, mock.ANY)])
+        assert expected == ioloop_instance_mock.mock_calls
+
+    @mock.patch('tornado.ioloop.IOLoop.instance')
+    def test_graceful_final_shutdown(self, ioloop_instance_mock):
+        service = MyService()
+        service.main()
+        service.config.max_grace_seconds = -10
+
+        expected = [mock.call(), mock.call().add_handler(mock.ANY, mock.ANY,
+                                                         mock.ANY),
+                    mock.call(), mock.call().start()]
+        assert expected == ioloop_instance_mock.mock_calls
+
+        service.shutdown()
+
+        expected.extend([mock.call(), mock.call().remove_handler(mock.ANY),
+                         mock.call().stop()])
+        assert expected == ioloop_instance_mock.mock_calls
+
+        service.config.max_grace_seconds = 3
 
 
 class ApplicationIntegrationTest(AsyncHTTPTestCase):

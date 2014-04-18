@@ -27,6 +27,7 @@ import logging
 from logging import Formatter, StreamHandler
 import os
 import signal
+import socket
 import sys
 import time
 
@@ -100,7 +101,6 @@ class Service(object):
         self.server = HTTPServer(app)
 
         if self.config.socketfd:
-            import socket
             sock = socket.fromfd(int(self.config.socketfd), socket.AF_INET,
                                  socket.SOCK_STREAM)
             self.server.add_socket(sock)
@@ -109,7 +109,7 @@ class Service(object):
             self.server.start(1)
 
         def sig_handler(sig, frame):
-            IOLoop.instance().add_callback(self.shutdown)
+            IOLoop.instance().add_callback(self.shutdown)    # pragma: no cover
         signal.signal(signal.SIGTERM, sig_handler)
         signal.signal(signal.SIGINT, sig_handler)
 
