@@ -24,7 +24,9 @@ from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
 import logging
+from logging import Formatter, StreamHandler
 import os
+import sys
 
 import tornado.options
 from tornado.httpserver import HTTPServer
@@ -37,7 +39,8 @@ from supercell.logging import SupercellLoggingHandler
 
 define('logfile', default='root-%(pid)s.log',
        help='Filename to store the logs. If the name contains "%%(pid)s" ' +
-       'it will be replaced with the pid.')
+       'it will be replaced with the pid. If the filename equals to "-" ' +
+       'the logs are being written to stdout')
 
 
 define('loglevel', default='INFO', help='Log level')
@@ -214,15 +217,29 @@ class Service(object):
 
         It is difficult to check whether the logging system is already
         initialized, so we are currently only checking if a
-        :class:`TimedRotatingFileHandler` has already been added to the `root`
+        :class:`SupercellLoggingHandler` has already been added to the `root`
         logger. This should only be necessary when running unittests though.'''
         root = logging.getLogger()
 
+        if self.config.logfile == '-':
+            clazz = StreamHandler
+            logfile = sys.stdout
+        else:
+            clazz = SupercellLoggingHandler
+            logfile = self.config.logfile
+
         hdlrs = [h for h in root.handlers
-                 if isinstance(h, SupercellLoggingHandler)]
+                 if isinstance(h, clazz)]
         if len(hdlrs) == 0:
             root.setLevel(getattr(logging, self.config.loglevel))
-            root.addHandler(SupercellLoggingHandler(self.config.logfile))
+            hdlr = clazz(logfile)
+            formatter = Formatter(' - '.join(['[%(asctime)s',
+                                              '%(relativeCreated).3f]',
+                                              '%(name)s',
+                                              '%(levelname)s',
+                                              '%(message)s']))
+            hdlr.setFormatter(formatter)
+            root.addHandler(hdlr)
 
     def bootstrap(self):
         '''Implement this method in order to manipulate the configuration
