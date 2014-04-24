@@ -1,5 +1,5 @@
-0.6.0 -
----------------------------
+0.6.0 - (April 24, 2014)
+------------------------
 
 - add graceful shutdown
 - allow logging to `stdout`
