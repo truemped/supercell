@@ -120,7 +120,7 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
         :param model: the model to convert to a certain content type
         :type model: :class:`schematics.models.Model`
         '''
-        raise NotImplemented()
+        raise NotImplementedError
 
 
 class JsonConsumer(ConsumerBase):

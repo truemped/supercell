@@ -114,7 +114,7 @@ class RequestHandler(rq):
     def get_template(self, model):
         '''Method to determine which template to use for rendering the html.
         '''
-        raise NotImplemented
+        raise NotImplementedError
 
     def _execute_method(self):
         '''Execute the request.

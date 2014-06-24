@@ -127,7 +127,7 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
         :param model: the model to convert to a certain content type
         :type model: supercell.schematics.Model
         '''
-        raise NotImplemented()
+        raise NotImplementedError
 
 
 class JsonProvider(ProviderBase):
