@@ -33,7 +33,7 @@ def provides(content_type, vendor=None, version=None, default=False):
     In order to allow the **application/json** content type, create the handler
     class like this::
 
-        @s.provides(sMediaType.ApplicationJson)
+        @s.provides(s.MediaType.ApplicationJson)
         class MyHandler(s.RequestHandler):
             pass
 
