@@ -10,3 +10,5 @@ In the list of contributing to the codebase:
 - Tobias Guenther < tobias.guenther at retresco de >
 
 - Matthias Rebel < matthias.rebel at retresco de >
+
+- Fabian Neumann < mail at fabianneumann de >

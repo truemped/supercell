@@ -1,3 +1,10 @@
+0.6.1 - (December 23, 2014)
+---------------------------
+
+- Optionally install signal handlers
+- Fix: the exception is called NotImplementedError.
+- Fix minor typo in @provides docstring
+
 0.6.0 - (April 24, 2014)
 ------------------------
 
