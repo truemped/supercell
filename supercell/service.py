@@ -82,7 +82,7 @@ class Service(object):
     '''Main service implementation managing the
     :class:`tornado.web.Application` and taking care of configuration.'''
 
-    def main(self):
+    def main(self, with_signals=True):
         '''Main method starting a **supercell** process.
 
         This will first instantiate the :class:`tornado.web.Application` and
@@ -108,10 +108,11 @@ class Service(object):
             self.server.bind(self.config.port, address=self.config.address)
             self.server.start(1)
 
-        def sig_handler(sig, frame):
-            IOLoop.instance().add_callback(self.shutdown)    # pragma: no cover
-        signal.signal(signal.SIGTERM, sig_handler)
-        signal.signal(signal.SIGINT, sig_handler)
+        if with_signals:
+            def sig_handler(sig, frame):
+                IOLoop.instance().add_callback(self.shutdown)    # noqa
+            signal.signal(signal.SIGTERM, sig_handler)
+            signal.signal(signal.SIGINT, sig_handler)
 
         self.slog.info('Starting supercell')
         IOLoop.instance().start()
