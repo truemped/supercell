@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-'''Helpers for dealing with HTTP level caching.
+"""Helpers for dealing with HTTP level caching.
 
 The `Cache-Control` and `Expires` header can be defined while adding a handler
 to the environment::
@@ -32,7 +32,7 @@ The details of setting the `CacheControl` header are documented in the
 :func:`CacheConfig`. The `expires` argument simply takes a
 :func:`datetime.timedelta` as input and will then generate the `Expires` header
 based on the current time and the :func:`datetime.timedelta`.
-'''
+"""
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
@@ -51,7 +51,7 @@ CacheConfigT = namedtuple('CacheConfigT', ['max_age', 's_max_age', 'public',
 def CacheConfig(max_age, s_max_age=None, public=False, private=False,
                 no_cache=False, no_store=False, must_revalidate=True,
                 proxy_revalidate=False):
-    '''Create a :class:`CacheConfigT` with default values.
+    """Create a :class:`CacheConfigT` with default values.
     :param max_age: Number of seconds the response can be cached
     :type max_age: datetime.timedelta
 
@@ -80,7 +80,7 @@ def CacheConfig(max_age, s_max_age=None, public=False, private=False,
     :param proxy_revalidate: Like `must_revalidate` except it only applies to
                              public caches
     :type proxy_revalidate: bool
-    '''
+    """
     return CacheConfigT(max_age, s_max_age=s_max_age, public=public,
                         private=private, no_cache=no_cache, no_store=no_store,
                         must_revalidate=must_revalidate,
@@ -88,13 +88,13 @@ def CacheConfig(max_age, s_max_age=None, public=False, private=False,
 
 
 def compute_cache_header(cache_config):
-    '''Compute the cache header for a given :class:`CacheConfigT`.
+    """Compute the cache header for a given :class:`CacheConfigT`.
 
     :param cache_config: The :class:`CacheConfigT` defining the cache params
     :type cache_config: :class:`supercell.api.cache.CacheConfigT`
     :return: The computed `Cache-Control` header
     :rtype: str
-    '''
+    """
     params = []
     params.append('max-age=%s' % cache_config.max_age.seconds)
     if cache_config.s_max_age:

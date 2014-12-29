@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-'''Simple decorator for dealing with typed query parameters.'''
+"""Simple decorator for dealing with typed query parameters."""
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 

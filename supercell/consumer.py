@@ -30,18 +30,18 @@ __all__ = ['NoConsumerFound', 'ConsumerBase', 'JsonConsumer']
 
 
 class NoConsumerFound(Exception):
-    '''Raised if no matching consumer for the client's `Content-Type` header
-    was found.'''
+    """Raised if no matching consumer for the client's `Content-Type` header
+    was found."""
     pass
 
 
 class ConsumerMeta(type):
-    '''Meta class for all consumers.
+    """Meta class for all consumers.
 
     This will simply register a consumer with the respective content type
     information and make them available in a list of content types and their
     consumer.
-    '''
+    """
 
     KNOWN_CONTENT_TYPES = defaultdict(list)
 
@@ -57,7 +57,7 @@ class ConsumerMeta(type):
 
 
 class ConsumerBase(with_metaclass(ConsumerMeta, object)):
-    '''Base class for content type consumers.
+    """Base class for content type consumers.
 
     In order to create a new consumer, you must create a new class that
     inherits from :py:class:`ConsumerBase` and sets the
@@ -71,17 +71,17 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
                 return model(lxml.from_string(handler.request.body))
 
     .. seealso:: :py:mod:`supercell.api.consumer.JsonConsumer.consume`
-    '''
+    """
 
     CONTENT_TYPE = None
-    '''The target content type for the consumer.
+    """The target content type for the consumer.
 
     :type: `supercell.api.ContentType`
-    '''
+    """
 
     @staticmethod
     def map_consumer(content_type, handler):
-        '''Map a given content type to the correct provider implementation.
+        """Map a given content type to the correct provider implementation.
 
         If no provider matches, raise a `NoProviderFound` exception.
 
@@ -90,7 +90,7 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
         :param handler: supercell request handler
 
         :raises: :exc:`NoConsumerFound`
-        '''
+        """
         accept = parse_accept_header(content_type)
         if len(accept) == 0:
             raise NoConsumerFound()
@@ -114,26 +114,26 @@ class ConsumerBase(with_metaclass(ConsumerMeta, object)):
         raise NoConsumerFound()
 
     def consume(self, handler, model):
-        '''This method should return the correct representation as a parsed
+        """This method should return the correct representation as a parsed
         model.
 
         :param model: the model to convert to a certain content type
         :type model: :class:`schematics.models.Model`
-        '''
+        """
         raise NotImplementedError
 
 
 class JsonConsumer(ConsumerBase):
-    '''Default **application/json** provider.'''
+    """Default **application/json** provider."""
 
     CONTENT_TYPE = ContentType(MediaType.ApplicationJson)
-    '''The **application/json** :class:`ContentType`.'''
+    """The **application/json** :class:`ContentType`."""
 
     def consume(self, handler, model):
-        '''Parse the body json via :func:`json.loads` and initialize the
+        """Parse the body json via :func:`json.loads` and initialize the
         `model`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
-        '''
+        """
         # TODO error if no request body is set
         return model(json.loads(handler.request.body))

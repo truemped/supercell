@@ -23,11 +23,11 @@ import os
 
 
 class SupercellLoggingHandler(TimedRotatingFileHandler):
-    '''Logging handler for :mod:`supercell` applications.
-    '''
+    """Logging handler for :mod:`supercell` applications.
+    """
 
     def __init__(self, logfile):
-        '''Initialize the :class:`TimedRotatingFileHandler`.'''
+        """Initialize the :class:`TimedRotatingFileHandler`."""
         logfile = logfile % {'pid': os.getpid()}
         TimedRotatingFileHandler.__init__(self, logfile, when='d',
                                           interval=1, backupCount=10)

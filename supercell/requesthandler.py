@@ -42,10 +42,10 @@ _DEFAULT_CONTENT_TYPE = 'DEFAULT'
 
 
 def _decode_utf8_and_latin1(value):
-    '''Convert an string argument to a unicode string.
+    """Convert an string argument to a unicode string.
 
     Instead of decoding it as utf-8 we assume it is encoded as latin1.
-    '''
+    """
     try:
         return to_unicode(value)
     except UnicodeDecodeError:
@@ -57,51 +57,51 @@ def _decode_utf8_and_latin1(value):
 
 
 class RequestHandler(rq):
-    '''**supercell** request handler.
+    """**supercell** request handler.
 
     The only difference to the :class:`tornado.web.RequestHandler` is an
     adopted :func:`RequestHandler._execute_method()` method that will handle
     the consuming and providing of request inputs and results.
-    '''
+    """
 
     @property
     def environment(self):
-        '''Convinience method for accessing the environment.'''
+        """Convinience method for accessing the environment."""
         return self.application.environment
 
     @property
     def config(self):
-        '''Convinience method for accessing the environment.'''
+        """Convinience method for accessing the environment."""
         return self.application.config
 
     @property
     def logger(self):
-        '''Use this property to write to the log files.
+        """Use this property to write to the log files.
 
         In a request handler you would simply log messages like this::
 
             def get(self):
                 self.logger.info('A test')
-        '''
+        """
         if not hasattr(self, '_logger'):
             name = '%s:%s' % (self.__class__.__name__, self.request_id)
             self._logger = logging.getLogger(name)
         return self._logger
 
     def decode_argument(self, value, name=None):
-        '''Overwrite the default :func:`RequestHandler.decode_argument()`
+        """Overwrite the default :func:`RequestHandler.decode_argument()`
         method in order to allow *latin1* encoded URLs.
-        '''
+        """
         return _decode_utf8_and_latin1(value)
 
     @property
     def request_id(self):
-        '''Return a unique id per request. Collisions are allowed but should
+        """Return a unique id per request. Collisions are allowed but should
         should not occur within a 10 minutes time window.
 
         The current implementation is based on a timestamp in milliseconds
         substracted by a large number to make the id smaller.
-        '''
+        """
         if not hasattr(self, '_request_id'):
             self._request_id = int(time.time() * 1000) - 1374400000000
         return self._request_id
@@ -112,15 +112,15 @@ class RequestHandler(rq):
             str(self.request_id) + ")"
 
     def get_template(self, model):
-        '''Method to determine which template to use for rendering the html.
-        '''
+        """Method to determine which template to use for rendering the html.
+        """
         raise NotImplementedError
 
     def _execute_method(self):
-        '''Execute the request.
+        """Execute the request.
 
         The method to be executed is determined by the request method.
-        '''
+        """
         if not self._finished:
             verb = self.request.method.lower()
             headers = self.request.headers
@@ -157,8 +157,8 @@ class RequestHandler(rq):
                 future_model.add_done_callback(callback)
 
     def _provide_result(self, verb, headers, future_model):
-        '''Find the correct provider for the result and call it with the final
-        result.'''
+        """Find the correct provider for the result and call it with the final
+        result."""
         result = future_model.result()
 
         if isinstance(result, ReturnInformationT):

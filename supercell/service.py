@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 #
-'''A :class:`Service` is the main element of a `supercell` application. It will
+"""A :class:`Service` is the main element of a `supercell` application. It will
 instanciate the :class:`supercell.api.Environment` and parse the configuration
 files as well as the command line. In the final step the
 :class:`tornado.web.Application` is created and bound to a socket.
-'''
+"""
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
@@ -79,11 +79,11 @@ define('show_config', default=False,
 
 
 class Service(object):
-    '''Main service implementation managing the
-    :class:`tornado.web.Application` and taking care of configuration.'''
+    """Main service implementation managing the
+    :class:`tornado.web.Application` and taking care of configuration."""
 
     def main(self, with_signals=True):
-        '''Main method starting a **supercell** process.
+        """Main method starting a **supercell** process.
 
         This will first instantiate the :class:`tornado.web.Application` and
         then bind it to the socket. There are two possibilities to bind to a
@@ -95,7 +95,7 @@ class Service(object):
         (http://circus.readthedocs.org/). There you would bind the socket from
         circus and start the worker processes by binding to the file
         descriptor.
-        '''
+        """
         app = self.get_app()
 
         self.server = HTTPServer(app)
@@ -141,10 +141,10 @@ class Service(object):
         stop_loop()
 
     def get_app(self):
-        '''Create the :class:`tornado.web.Appliaction` instance and return it.
+        """Create the :class:`tornado.web.Appliaction` instance and return it.
 
         In this method the :func:`Service.bootstrap()` is called, then
-        :func:`Service.run()` will initialize the app.'''
+        :func:`Service.run()` will initialize the app."""
 
         # initialize the environment
         self.environment
@@ -187,23 +187,23 @@ class Service(object):
 
     @property
     def slog(self):
-        '''Initialize the logging and return the logger.'''
+        """Initialize the logging and return the logger."""
         if not hasattr(self, '_slog'):
             self._slog = logging.getLogger('supercell')
         return self._slog
 
     @property
     def environment(self):
-        '''The default environment instance.'''
+        """The default environment instance."""
         if not hasattr(self, '_environment'):
             self._environment = Environment()
         return self._environment
 
     @property
     def config(self):
-        '''Assemble the configration files and command line arguments in order
+        """Assemble the configration files and command line arguments in order
         to finalize the service's configuration. All configuration values
-        can be overwritten by the command line.'''
+        can be overwritten by the command line."""
         if not hasattr(self, '_config'):
             # parse config files and command line arguments
             self.parse_config_files()
@@ -213,7 +213,7 @@ class Service(object):
         return self._config
 
     def parse_config_files(self):
-        '''Parse the config files and return the `config` object, i.e. the
+        """Parse the config files and return the `config` object, i.e. the
         `tornado.options.options` instance. For each entry in the
         `Environment.config_file_paths()` it will check for a general
         *config.py* and then for a file named as defined by
@@ -231,7 +231,7 @@ class Service(object):
             By default we disable the :py:mod:`tornado.log` module, you can
             enable this though using by setting the `logging` config to some
             valid log level string.
-        '''
+        """
         tornado.options.options._options['logging'].set('none')
         filename = self.environment.config_name
         for path in self.environment.config_file_paths:
@@ -244,17 +244,17 @@ class Service(object):
                 tornado.options.parse_config_file(cfg)
 
     def parse_command_line(self):
-        '''Parse the command line arguments to set different configuration
-        values.'''
+        """Parse the command line arguments to set different configuration
+        values."""
         tornado.options.parse_command_line()
 
     def initialize_logging(self):
-        '''Initialize the python logging system.
+        """Initialize the python logging system.
 
         It is difficult to check whether the logging system is already
         initialized, so we are currently only checking if a
         :class:`SupercellLoggingHandler` has already been added to the `root`
-        logger. This should only be necessary when running unittests though.'''
+        logger. This should only be necessary when running unittests though."""
         root = logging.getLogger()
 
         if self.config.logfile == '-':
@@ -278,11 +278,11 @@ class Service(object):
             root.addHandler(hdlr)
 
     def bootstrap(self):
-        '''Implement this method in order to manipulate the configuration
-        paths, e.g..'''
+        """Implement this method in order to manipulate the configuration
+        paths, e.g.."""
         pass
 
     def run(self):
-        '''Implement this method in order to add handlers and managed objects
-        to the environment, before the app is started.'''
+        """Implement this method in order to add handlers and managed objects
+        to the environment, before the app is started."""
         pass

@@ -15,9 +15,9 @@
 # limitations under the License.
 #
 #
-'''Several decorators for using with :class:`supercell.api.RequestHandler`
+"""Several decorators for using with :class:`supercell.api.RequestHandler`
 implementations.
-'''
+"""
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
@@ -27,7 +27,7 @@ from supercell.mediatypes import ContentType
 
 
 def provides(content_type, vendor=None, version=None, default=False):
-    '''Class decorator for mapping HTTP GET responses to content types and
+    """Class decorator for mapping HTTP GET responses to content types and
     their representation.
 
     In order to allow the **application/json** content type, create the handler
@@ -51,10 +51,10 @@ def provides(content_type, vendor=None, version=None, default=False):
     :param float version: The vendor version
     :param bool default: If **True** and no **Accept** header is present, this
                          content type is provided
-    '''
+    """
 
     def wrapper(cls):
-        '''The real class decorator.'''
+        """The real class decorator."""
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
             'class decorator'
 
@@ -75,7 +75,7 @@ def provides(content_type, vendor=None, version=None, default=False):
 
 
 def consumes(content_type, model, vendor=None, version=None):
-    '''Class decorator for mapping HTTP POST and PUT bodies to
+    """Class decorator for mapping HTTP POST and PUT bodies to
 
     Example::
 
@@ -91,10 +91,10 @@ def consumes(content_type, model, vendor=None, version=None):
     :type model: :class:`schematics.models.Model`
     :param str vendor: Any vendor information for the base content type
     :param float version: The vendor version
-    '''
+    """
 
     def wrapper(cls):
-        '''The real decorator.'''
+        """The real decorator."""
         assert isinstance(cls, type), 'This decorator may only be used as ' + \
             'class decorator'
         assert model, 'In order to consume content a schematics model ' + \

@@ -29,18 +29,18 @@ __all__ = ['NoProviderFound', 'ProviderBase', 'JsonProvider']
 
 
 class NoProviderFound(Exception):
-    '''Raised if no matching provider for the client's `Accept` header was
-    found.'''
+    """Raised if no matching provider for the client's `Accept` header was
+    found."""
     pass
 
 
 class ProviderMeta(type):
-    '''Meta class for all content type providers.
+    """Meta class for all content type providers.
 
     This will simply register a provider with the respective content type
     information and make them available in a list of content types and their
     mappers.
-    '''
+    """
 
     KNOWN_CONTENT_TYPES = defaultdict(list)
 
@@ -56,7 +56,7 @@ class ProviderMeta(type):
 
 
 class ProviderBase(with_metaclass(ProviderMeta, object)):
-    '''Base class for content type providers.
+    """Base class for content type providers.
 
     Creating a new provider is just as simple as creating new consumers::
 
@@ -67,17 +67,17 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
             def provide(self, model, handler):
                 self.set_header('Content-Type', 'application/xml')
                 handler.write(model.to_xml())
-    '''
+    """
 
     CONTENT_TYPE = None
-    '''The target content type for the provider.
+    """The target content type for the provider.
 
     :type: `supercell.api.ContentType`
-    '''
+    """
 
     @staticmethod
     def map_provider(accept_header, handler, allow_default=False):
-        '''Map a given content type to the correct provider implementation.
+        """Map a given content type to the correct provider implementation.
 
         If no provider matches, raise a `NoProviderFound` exception.
 
@@ -85,7 +85,7 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
         :type accept_header: str
         :param handler: supercell request handler
         :raises: :exc:`NoProviderFound`
-        '''
+        """
         if not hasattr(handler, '_PROD_CONTENT_TYPES'):
             raise NoProviderFound()
 
@@ -121,37 +121,37 @@ class ProviderBase(with_metaclass(ProviderMeta, object)):
         raise NoProviderFound()
 
     def provide(self, model, handler):
-        '''This method should return the correct representation as a simple
+        """This method should return the correct representation as a simple
         string (i.e. byte buffer) that will be used as return value.
 
         :param model: the model to convert to a certain content type
         :type model: supercell.schematics.Model
-        '''
+        """
         raise NotImplementedError
 
 
 class JsonProvider(ProviderBase):
-    '''Default `application/json` provider.'''
+    """Default `application/json` provider."""
 
     CONTENT_TYPE = ContentType(MediaType.ApplicationJson)
 
     def provide(self, model, handler):
-        '''Simply return the json via `json.dumps`.
+        """Simply return the json via `json.dumps`.
 
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
-        '''
+        """
         model.validate()
         handler.write(model.to_primitive())
 
 
 class TornadoTemplateProvider(ProviderBase):
-    '''Default provider for `text/html`.'''
+    """Default provider for `text/html`."""
 
     CONTENT_TYPE = ContentType(MediaType.TextHtml)
 
     def provide(self, model, handler):
-        '''Render a template with the given model into HTML.
+        """Render a template with the given model into HTML.
 
-        By default we will use the tornado built in template language.'''
+        By default we will use the tornado built in template language."""
         model.validate()
         handler.render(handler.get_template(model), **model.to_primitive())

@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 #
-'''Health checks provide a way for the hoster to check if the application is
+"""Health checks provide a way for the hoster to check if the application is
 still running and working as expected.
 
 The most basic health check is enabled by default on the */_system/check*
@@ -62,7 +62,7 @@ and an error a similar one::
 
     $ curl 'http://127.0.0.1/_system/check/http_resource_with_warning'
     {"code": "ERROR", "error": true}
-'''
+"""
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
@@ -73,26 +73,26 @@ from supercell.requesthandler import RequestHandler
 
 
 class HealthCheckOk(Ok):
-    '''Exception for health checks return values indicating a **OK**
-    health check.'''
+    """Exception for health checks return values indicating a **OK**
+    health check."""
 
     def __init__(self, additional=None):
-        '''Initialize the health checks response.'''
+        """Initialize the health checks response."""
         additional = additional or {}
         additional['code'] = 'OK'
         super(HealthCheckOk, self).__init__(code=200, additional=additional)
 
 
 class HealthCheckWarning(Error):
-    '''Exception for health checks return values indicating a
+    """Exception for health checks return values indicating a
     **WARNING** health check.
 
     The **WARNING** state indicates a problem that is not critical to the
     application. This could involve things like long response and similar
-    problems.'''
+    problems."""
 
     def __init__(self, additional=None):
-        '''Initialize the health checks response.'''
+        """Initialize the health checks response."""
         additional = additional or {}
         additional['code'] = 'WARNING'
         super(HealthCheckWarning, self).__init__(code=500,
@@ -100,14 +100,14 @@ class HealthCheckWarning(Error):
 
 
 class HealthCheckError(Error):
-    '''Exception for health checks return values indicating a
+    """Exception for health checks return values indicating a
     **ERROR** health check.
 
     The **ERROR** state indicates a major problem like a failed connection to a
-    database.'''
+    database."""
 
     def __init__(self, additional=None):
-        '''Initialize the health checks response.'''
+        """Initialize the health checks response."""
         additional = additional or {}
         additional['code'] = 'ERROR'
         super(HealthCheckError, self).__init__(code=500,
@@ -116,7 +116,7 @@ class HealthCheckError(Error):
 
 @provides(MediaType.ApplicationJson, default=True)
 class SystemHealthCheck(RequestHandler):
-    '''The default system health check.
+    """The default system health check.
 
     This check is returning this JSON::
 
@@ -127,9 +127,9 @@ class SystemHealthCheck(RequestHandler):
     other systems are working correctly, you probably need to create more
     instances of the service since the current number of processes cannot
     deal with the number of requests coming from the outside.
-    '''
+    """
 
     @async
     def get(self):
-        '''Run the default **/_system** healthcheck and return it's result.'''
+        """Run the default **/_system** healthcheck and return it's result."""
         raise HealthCheckOk(additional={'message': 'API running'})

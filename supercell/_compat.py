@@ -15,12 +15,12 @@
 # limitations under the License.
 #
 #
-'''
+"""
 Python 2.6/2.7/3.3 compatibility module.
 
 Heavily inspired by jinja2 and
 http://lucumr.pocoo.org/2013/5/21/porting-to-python-3-redux/
-'''
+"""
 import sys
 
 __all__ = ['unichr', 'range_type', 'text_type', 'string_types', 'iterkeys',

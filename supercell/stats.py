@@ -30,7 +30,7 @@ from supercell.requesthandler import RequestHandler
 
 
 def latency(fn):
-    '''Measure execution latency of a certain request method.
+    """Measure execution latency of a certain request method.
 
     In order to measure latency for GET requests of a request handler you
     simply have to add the :func:`latency` decorator to the declaration::
@@ -48,7 +48,7 @@ def latency(fn):
     the latency of GET/POST/PUT etc methods are stored with the path. In order
     to access the stats you may call **/_system/stats/test/this** or
     **/_system/stats/test**, e.g.
-    '''
+    """
 
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
@@ -88,7 +88,7 @@ def latency(fn):
 
 
 def metered(fn):
-    '''Meter the execution of certain requests.
+    """Meter the execution of certain requests.
 
     The :func:`metered` stats will measure the 1/5/15 minutes averages for
     requests. This is also applied trivially::
@@ -101,7 +101,7 @@ def metered(fn):
     As with the :func:`latency` stats, the :func:`metered` stats are recorded
     along the request path, i.e. you can get the stats values using the
     **/_system/stats/** route.
-    '''
+    """
 
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
