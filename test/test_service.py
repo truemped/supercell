@@ -31,9 +31,8 @@ import pytest
 
 from schematics.models import Model
 from schematics.types import StringType
-from tornado.ioloop import IOLoop
 import tornado.options
-from tornado.testing import AsyncHTTPTestCase
+from supercell.testing import AsyncHTTPTestCase
 
 import supercell.api as s
 from supercell.environment import Environment
@@ -178,17 +177,8 @@ class ServiceTest(TestCase):
 
 class ApplicationIntegrationTest(AsyncHTTPTestCase):
 
-    @pytest.fixture(autouse=True)
-    def empty_commandline(self, monkeypatch):
-        monkeypatch.setattr(sys, 'argv', [])
-
-    def get_new_ioloop(self):
-        return IOLoop.instance()
-
-    def get_app(self):
-        service = MyService()
-        service.initialize_logging()
-        return service.get_app()
+    ARGV = []
+    SERVICE = MyService
 
     def test_simple_get(self):
         response = self.fetch('/test', headers={'Accept':
