@@ -1,3 +1,8 @@
+0.6.2 - (December 28, 2014)
+---------------------------
+
+- Simplify integration testing of services
+
 0.6.1 - (December 23, 2014)
 ---------------------------
 

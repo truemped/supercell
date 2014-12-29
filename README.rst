@@ -20,6 +20,7 @@ serializations of the domain models.
 .. |RequiresIo| image:: https://requires.io/github/truemped/supercell/requirements.png?branch=master
 .. _RequiresIo: https://requires.io/github/truemped/supercell/requirements/?branch=master
 
+
 Quick Links
 ===========
 
@@ -36,9 +37,11 @@ In order of contribution:
 * Daniel Truemper `@truemped <http://twitter.com/truemped>`_
 * Marko Drotschmann `@themakodi <http://twitter.com/themakodi>`_
 * Tobias Guenther `@tobigue_ <http://twitter.com/tobigue_>`_
+* Matthias Rebel `@_rebeling <http://twitter.com/_rebeling>`_
+* Fabian Neumann `@hellp <http://twitter.com/hellp>`_
 
 
 License
 =======
 
-License under Apache 2.0 -- see LICENSE
+Licensed under Apache 2.0 -- see LICENSE
