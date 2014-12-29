@@ -51,7 +51,7 @@ setup(
     url='http://supercell.readthedocs.org/',
     license="http://www.apache.org/licenses/LICENSE-2.0",
 
-    description='',
+    description='Supercell is a framework for creating RESTful APIs that loosely follow the idea of domain driven design.',
     packages=['supercell'],
 
     install_requires=[
