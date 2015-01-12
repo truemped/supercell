@@ -33,7 +33,7 @@ class AsyncHTTPTestCase(TornadoAsyncHTTPTestCase):
 
     @pytest.fixture(autouse=True)
     def set_commandline(self, monkeypatch):
-        monkeypatch.setattr(sys, 'argv', self.ARGV)
+        monkeypatch.setattr(sys, 'argv', ['pytest'] + self.ARGV)
 
     def get_new_ioloop(self):
         return IOLoop.instance()
