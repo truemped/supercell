@@ -39,7 +39,7 @@ extras_require = {}
 extras_require['test'] = tests_require
 extras_require['futures'] = ''
 if PY2:
-    extras_require['futures'] = 'futures == 2.1.3'
+    extras_require['futures'] = 'futures == 2.2.0'
 
 
 setup(
