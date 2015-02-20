@@ -19,15 +19,17 @@ from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
 from datetime import datetime
-from functools import partial
 import json
 import logging
 import time
 
 from schematics.models import Model
+from tornado import gen, iostream
+from tornado.concurrent import is_future
 from tornado.escape import to_unicode
 from tornado.util import bytes_type, unicode_type
-from tornado.web import RequestHandler as rq, HTTPError
+from tornado.web import (RequestHandler as rq, HTTPError,
+                         _has_stream_request_body)
 
 from supercell.cache import compute_cache_header
 from supercell.mediatypes import MediaType, ReturnInformationT
@@ -60,7 +62,7 @@ class RequestHandler(rq):
     """**supercell** request handler.
 
     The only difference to the :class:`tornado.web.RequestHandler` is an
-    adopted :func:`RequestHandler._execute_method()` method that will handle
+    adopted :func:`RequestHandler._execute()` method that will handle
     the consuming and providing of request inputs and results.
     """
 
@@ -116,50 +118,114 @@ class RequestHandler(rq):
         """
         raise NotImplementedError
 
-    def _execute_method(self):
-        """Execute the request.
+    def _check_consumer(self):
+        """For a POST or PUT request check if we can find a matching
+        consumer for the incoming data."""
+        verb = self.request.method.lower()
+        headers = self.request.headers
+        kwargs = self.path_kwargs
 
-        The method to be executed is determined by the request method.
+        if verb in ['post', 'put'] and 'Content-Type' in headers:
+            # try to find a matching consumer
+            try:
+                (model, consumer_class) = ConsumerBase.map_consumer(
+                    headers['Content-Type'], self)
+                consumer = consumer_class()
+                kwargs['model'] = consumer.consume(self, model)
+            except NoConsumerFound:
+                # TODO return available consumer types?!
+                raise HTTPError(406)
+            except StandardError as e:
+                raise HTTPError(400, reason=unicode(e))
+
+    def _add_cache_headers(self):
+        """Maybe add cache headers on GET and HEAD requests."""
+        verb = self.request.method.lower()
+        if verb in ['get', 'head']:
+            # check if there is caching information stored with the handler
+            cache_config = self.environment.get_cache_info(self.__class__)
+            if cache_config:
+                self.set_header('Cache-Control',
+                                compute_cache_header(cache_config))
+
+            expires = self.environment.get_expires_info(self.__class__)
+            if expires:
+                self.set_header('Expires', datetime.now() + expires)
+
+    @gen.coroutine
+    def prepare(self):
+        """Check for a consumer and optionally add the cache headers.
+
+        note:: when overriding the `prepare()` method, don't forget to call
+               the super method.
         """
-        if not self._finished:
-            verb = self.request.method.lower()
-            headers = self.request.headers
-            method = getattr(self, verb)
-            kwargs = self.path_kwargs
+        self._check_consumer()
+        self._add_cache_headers()
 
-            if verb in ['post', 'put'] and 'Content-Type' in headers:
-                # try to find a matching consumer
+    @gen.coroutine
+    def _execute(self, transforms, *args, **kwargs):
+        """Executes this request with the given output transforms.
+
+        This is basically a copy of tornado's `_execute()` method. The only
+        difference is the expected result. Tornado expects the result to be
+        `None`, where we want this to be a :py:class:Model."""
+        verb = self.request.method.lower()
+        headers = self.request.headers
+        self._transforms = transforms
+        try:
+            if self.request.method not in self.SUPPORTED_METHODS:
+                raise HTTPError(405)
+            self.path_args = [self.decode_argument(arg) for arg in args]
+            self.path_kwargs = dict((k, self.decode_argument(v, name=k))
+                                    for (k, v) in kwargs.items())
+            # If XSRF cookies are turned on, reject form submissions without
+            # the proper cookie
+            if self.request.method not in ("GET", "HEAD", "OPTIONS") and \
+                    self.application.settings.get("xsrf_cookies"):
+                self.check_xsrf_cookie()
+
+            result = self.prepare()
+            if is_future(result):
+                result = yield result
+            if result is not None:
+                raise TypeError("Expected None, got %r" % result)
+            if self._prepared_future is not None:
+                # Tell the Application we've finished with prepare()
+                # and are ready for the body to arrive.
+                self._prepared_future.set_result(None)
+            if self._finished:
+                return
+
+            if _has_stream_request_body(self.__class__):
+                # In streaming mode request.body is a Future that signals
+                # the body has been completely received.  The Future has no
+                # result; the data has been passed to self.data_received
+                # instead.
                 try:
-                    (model, consumer_class) = ConsumerBase.map_consumer(
-                        headers['Content-Type'], self)
-                    consumer = consumer_class()
-                    kwargs['model'] = consumer.consume(self, model)
-                except NoConsumerFound:
-                    # TODO return available consumer types?!
-                    raise HTTPError(406)
-                except StandardError as e:
-                    raise HTTPError(400, reason=unicode(e))
+                    yield self.request.body
+                except iostream.StreamClosedError:
+                    return
 
-            if verb in ['get', 'head']:
-                # check if there is caching information stored with the handler
-                cache_config = self.environment.get_cache_info(self.__class__)
-                if cache_config:
-                    self.set_header('Cache-Control',
-                                    compute_cache_header(cache_config))
+            method = getattr(self, self.request.method.lower())
+            result = method(*self.path_args, **self.path_kwargs)
+            if is_future(result):
+                result = yield result
+            if result is not None:
+                self._provide_result(verb, headers, result)
+            if self._auto_finish and not self._finished:
+                self.finish()
+        except Exception as e:
+            self._handle_request_exception(e)
+            if (self._prepared_future is not None and
+                    not self._prepared_future.done()):
+                # In case we failed before setting _prepared_future, do it
+                # now (to unblock the HTTP server).  Note that this is not
+                # in a finally block to avoid GC issues prior to Python 3.4.
+                self._prepared_future.set_result(None)
 
-                expires = self.environment.get_expires_info(self.__class__)
-                if expires:
-                    self.set_header('Expires', datetime.now() + expires)
-
-            future_model = method(*self.path_args, **kwargs)
-            if future_model:
-                callback = partial(self._provide_result, verb, headers)
-                future_model.add_done_callback(callback)
-
-    def _provide_result(self, verb, headers, future_model):
+    def _provide_result(self, verb, headers, result):
         """Find the correct provider for the result and call it with the final
         result."""
-        result = future_model.result()
 
         if isinstance(result, ReturnInformationT):
             self.set_header('Content-Type', MediaType.ApplicationJson)
@@ -183,7 +249,7 @@ class RequestHandler(rq):
 
             provider = provider_class()
             if isinstance(result, Model):
-                provider.provide(future_model.result(), self)
+                provider.provide(result, self)
 
         if not self._finished:
             self.finish()

@@ -22,8 +22,8 @@ from abc import ABCMeta, abstractmethod
 from functools import wraps
 
 from schematics.models import Model
+from tornado.gen import coroutine, Return
 
-from supercell.api import coroutine, Return
 from supercell._compat import with_metaclass
 from supercell.mediatypes import ReturnInformationT
 

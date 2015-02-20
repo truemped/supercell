@@ -25,9 +25,9 @@ from supercell.cache import CacheConfig
 from supercell.mediatypes import (ContentType, MediaType, Return, Ok, Error,
                                   OkCreated, NoContent)
 from supercell.decorators import provides, consumes
-from supercell.environment import Environment
 from supercell.health import (HealthCheckOk, HealthCheckWarning,
                               HealthCheckError)
+from supercell.environment import Environment
 from supercell.consumer import ConsumerBase, JsonConsumer
 from supercell.provider import ProviderBase, JsonProvider
 from supercell.requesthandler import RequestHandler

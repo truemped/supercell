@@ -51,13 +51,14 @@ setup(
     url='http://supercell.readthedocs.org/',
     license="http://www.apache.org/licenses/LICENSE-2.0",
 
-    description='Supercell is a framework for creating RESTful APIs that loosely follow the idea of domain driven design.',
+    description='Supercell is a framework for creating RESTful APIs that ' +
+                'loosely follow the idea of domain driven design.',
     packages=['supercell'],
 
     install_requires=[
-        'tornado >= 3.1.0, <= 3.2.0',
-        'schematics >= 0.9-4',
-        'scales >= 1.0.3'
+        'tornado >= 4.1',
+        'schematics >= 1.0.2',
+        'scales >= 1.0.8'
     ],
 
     tests_require=tests_require,
@@ -66,6 +67,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: Implementation :: PyPy',

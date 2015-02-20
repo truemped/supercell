@@ -36,9 +36,9 @@ import json
 from greplin import scales
 from greplin.scales import util
 
+from tornado.gen import coroutine as async
 from tornado.web import Application as _TAPP
 
-from supercell.api import async
 from supercell.cache import CacheConfigT
 from supercell.health import SystemHealthCheck
 from supercell.requesthandler import RequestHandler
