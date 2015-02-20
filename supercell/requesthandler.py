@@ -31,6 +31,7 @@ from tornado.util import bytes_type, unicode_type
 from tornado.web import (RequestHandler as rq, HTTPError,
                          _has_stream_request_body)
 
+from supercell._compat import text_type
 from supercell.cache import compute_cache_header
 from supercell.mediatypes import MediaType, ReturnInformationT
 from supercell.consumer import ConsumerBase, NoConsumerFound
@@ -135,8 +136,8 @@ class RequestHandler(rq):
             except NoConsumerFound:
                 # TODO return available consumer types?!
                 raise HTTPError(406)
-            except StandardError as e:
-                raise HTTPError(400, reason=unicode(e))
+            except Exception as e:
+                raise HTTPError(400, reason=text_type(e))
 
     def _add_cache_headers(self):
         """Maybe add cache headers on GET and HEAD requests."""

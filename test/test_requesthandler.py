@@ -18,6 +18,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+import json
 import os.path as op
 
 from schematics.models import Model
@@ -95,8 +96,9 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
         response = self.fetch('/test', headers={'Accept':
                                                 s.MediaType.ApplicationJson})
         self.assertEqual(response.code, 200)
-        self.assertEqual(response.body,
-                         '{"message": "A test", "doc_id": "test123"}')
+        self.assertEqual('{"doc_id": "test123", "message": "A test"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
     def test_handler_without_accept(self):
         response = self.fetch('/test')
@@ -105,8 +107,9 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
     def test_default_handler(self):
         response = self.fetch('/test_default')
         self.assertEqual(response.code, 200)
-        self.assertEqual(response.body,
-                         '{"message": "A test", "doc_id": "test123"}')
+        self.assertEqual('{"doc_id": "test123", "message": "A test"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
     def test_handler_with_missing_provider(self):
         response = self.fetch('/test', headers={'Accept':
@@ -121,7 +124,8 @@ class TestSimpleRequestHandler(AsyncHTTPTestCase):
                               body='{"message": "Simple message", "number": 1}'
                               )
         self.assertEqual(response.code, 201)
-        self.assertEqual(response.body, '{"docid": 123, "ok": true}')
+        self.assertEqual('{"docid": 123, "ok": true}', json.dumps(json.loads(
+            response.body.decode('utf8')), sort_keys=True))
 
     def test_post_handler_with_wrong_value_type(self):
         response = self.fetch('/test_post', method='POST',
@@ -158,16 +162,20 @@ class TestUrlEncoding(AsyncHTTPTestCase):
     def test_latinone_handler(self):
         response = self.fetch('/testencoding/alfredo-p%e9rez-rubalcaba')
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' +
-                         'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
-                         response.body)
+        self.assertEqual('{"doc_id": "test123", "message": "' +
+                         'args=(u\'alfredo-p\\\\xe9rez-' +
+                         'rubalcaba\',); kwargs={}"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
     def test_utfeight_handler(self):
         response = self.fetch('/testencoding/alfredo-p%C3%A9rez-rubalcaba')
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "args=(u\'alfredo-p\\\\xe9rez-' +
-                         'rubalcaba\',); kwargs={}", "doc_id": "test123"}',
-                         response.body)
+        self.assertEqual('{"doc_id": "test123", "message": "' +
+                         'args=(u\'alfredo-p\\\\xe9rez-' +
+                         'rubalcaba\',); kwargs={}"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True).encode('utf8'))
 
 
 class TestSimpleHtmlHandler(AsyncHTTPTestCase):
@@ -202,7 +210,7 @@ class TestSimpleHtmlHandler(AsyncHTTPTestCase):
         exp_html = ("<html>\n<head><title>Test</title></head>\n" +
                     "<body>\ndoc_id: test123\nmessage: bliblablup\n" +
                     "</body>\n</html>\n")
-        assert exp_html == response.body
+        assert exp_html == response.body.decode('utf8')
         self.assertEqual(exp_html, response.body)
 
 

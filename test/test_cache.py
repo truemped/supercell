@@ -149,4 +149,5 @@ class TestCacheDecorator(AsyncHTTPTestCase):
         self.assertEqual('max-age=10, must-revalidate',
                          response.headers['Cache-Control'])
         self.assertEqual('{"doc_id": "test123", "message": "A test"}',
-                         json.dumps(json.loads(response.body), sort_keys=True))
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))

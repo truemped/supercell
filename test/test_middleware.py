@@ -18,6 +18,8 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+import json
+
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 
@@ -133,7 +135,8 @@ class TestDummyHeaderMiddleware(AsyncHTTPTestCase):
         assert response.code == 200, 'Something went wrong'
         assert 'X-Dummy' in response.headers, 'Header missing'
         assert response.headers.get('X-Dummy') == 'kewl', 'wrong header value?'
-        assert response.body == '{"message": "A test", "doc_id": "test123"}'
+        assert '{"doc_id": "test123", "message": "A test"}' == json.dumps(
+            json.loads(response.body.decode('utf8')), sort_keys=True)
 
     def test_manipulating_query_params(self):
         response = self.fetch('/test?id=test432')
@@ -141,11 +144,13 @@ class TestDummyHeaderMiddleware(AsyncHTTPTestCase):
         assert response.code == 200, 'Something went wrong'
         assert 'X-Dummy' in response.headers, 'Header missing'
         assert response.headers.get('X-Dummy') == 'kewl', 'wrong header value?'
-        assert response.body == '{"message": "A test", "doc_id": "TEST432"}'
+        assert '{"doc_id": "TEST432", "message": "A test"}' == json.dumps(
+            json.loads(response.body.decode('utf8')), sort_keys=True)
 
     def test_returning_other_data_in_after(self):
         response = self.fetch('/otherresult')
 
         assert response.code == 200, 'Something went wrong'
-        assert response.body == \
-            '{"message": "forget about it!", "doc_id": "no way"}'
+        assert '{"doc_id": "no way", "message": "forget about it!"}' == \
+            json.dumps(json.loads(response.body.decode('utf8')),
+                       sort_keys=True)
