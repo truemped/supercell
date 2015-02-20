@@ -18,7 +18,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-import pytest
+import json
 
 from schematics.models import Model
 from schematics.types import StringType
@@ -85,27 +85,32 @@ class TestSimpleQueryParam(AsyncHTTPTestCase):
         response = self.fetch('/test?docid=1&message=A%20test')
 
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "A test", "doc_id": 1}', response.body)
+        self.assertEqual('{"doc_id": 1, "message": "A test"}', json.dumps(
+            json.loads(response.body.decode('utf8')), sort_keys=True))
 
     def test_missing_required_param(self):
         response = self.fetch('/test?docid=1')
 
         self.assertEqual(400, response.code)
-        self.assertEqual('{"msg": "Missing required argument ' +
-                         '\\"message\\"", "error": true}', response.body)
+        self.assertEqual('{"error": true, "msg": "Missing required argument ' +
+                         '\\"message\\""}', json.dumps(
+                             json.loads(response.body.decode('utf8')),
+                             sort_keys=True))
 
     def test_bad_param_validation(self):
         response = self.fetch('/test?docid=noway&message=1')
 
         self.assertEqual(400, response.code)
         self.assertEqual('{"docid": ["Value is not int"], "error": true}',
-                         response.body)
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
     def test_missing_optional_param(self):
         response = self.fetch('/test?message=test')
 
         self.assertEqual(200, response.code)
-        self.assertEqual('{"message": "test", "doc_id": 5}', response.body)
+        self.assertEqual('{"doc_id": 5, "message": "test"}', json.dumps(
+            json.loads(response.body.decode('utf8')), sort_keys=True))
 
 
 class TestSimpleQueryParamWithCustomKwargsName(TestSimpleQueryParam):

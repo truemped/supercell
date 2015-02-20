@@ -18,6 +18,8 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+import json
+
 from tornado.ioloop import IOLoop
 from tornado.testing import AsyncHTTPTestCase
 
@@ -39,9 +41,10 @@ class TestBasicHealthChecks(AsyncHTTPTestCase):
     def test_simple_check(self):
         response = self.fetch('/_system/check')
         self.assertEqual(response.code, 200)
-        self.assertEqual(response.body,
-                         '{"message": "API running", "code": "OK", "ok": true}'
-                         )
+        self.assertEqual(
+            '{"code": "OK", "message": "API running", "ok": true}',
+            json.dumps(json.loads(response.body.decode('utf8')),
+                       sort_keys=True))
 
 
 class SimpleHealthCheckExample(s.RequestHandler):
@@ -72,9 +75,13 @@ class TestCustomHealthCheck(AsyncHTTPTestCase):
     def test_simple_warning(self):
         response = self.fetch('/_system/check/test')
         self.assertEqual(response.code, 500)
-        self.assertEqual(response.body, '{"code": "WARNING", "error": true}')
+        self.assertEqual('{"code": "WARNING", "error": true}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
     def test_simple_error(self):
         response = self.fetch('/_system/check/error')
         self.assertEqual(response.code, 500)
-        self.assertEqual(response.body, '{"code": "ERROR", "error": true}')
+        self.assertEqual('{"code": "ERROR", "error": true}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))

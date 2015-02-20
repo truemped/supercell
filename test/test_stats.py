@@ -80,8 +80,9 @@ class TestSupercellStats(AsyncHTTPTestCase):
         # call the handler first so that something is recorded
         response = self.fetch('/teststats')
         self.assertEqual(response.code, 200)
-        self.assertEqual(response.body,
-                         '{"message": "A test", "doc_id": "test123"}')
+        self.assertEqual('{"doc_id": "test123", "message": "A test"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))
 
         # now check if we get something back in the stats
         response = self.fetch('/_system/stats')
@@ -90,24 +91,26 @@ class TestSupercellStats(AsyncHTTPTestCase):
 
         response = self.fetch('/_system/stats/teststats')
         self.assertEqual(response.code, 200)
-        expected = '{"latency": {"_long_method": {"count": 1}, "get":' + \
-                   ' {"count": 1}}, "_long_method": {"count": 1, "unit":' + \
-                   ' "per second"}}'
-        self.assertEqual(response.body, expected)
+        expected = '{"_long_method": {"count": 1, "unit":' + \
+            ' "per second"}, "latency": {"_long_method": ' + \
+            '{"count": 1}, "get":' + \
+            ' {"count": 1}}}'
+        self.assertEqual(expected, json.dumps(json.loads(
+            response.body.decode('utf8')), sort_keys=True))
 
         response = self.fetch('/teststats')
         self.assertEqual(response.code, 200)
 
         response = self.fetch('/_system/stats/teststats')
         self.assertEqual(response.code, 200)
-        result = json.loads(response.body)
+        result = json.loads(response.body.decode('utf8'))
         self.assertEqual(result['latency']['get']['count'], 2)
         self.assertEqual(result['latency']['_long_method']['count'], 2)
         self.assertEqual(result['_long_method']['count'], 2)
 
         response = self.fetch('/_system/stats/')
         self.assertEqual(response.code, 200)
-        result = json.loads(response.body)
+        result = json.loads(response.body.decode('utf8'))
         self.assertEqual(result['_internal']['test_stats']['MyTestObject']
                          ['do_something']['count'], 2)
         self.assertEqual(result['_internal']['test_stats']['MyTestObject']

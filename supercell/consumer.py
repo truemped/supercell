@@ -136,4 +136,4 @@ class JsonConsumer(ConsumerBase):
         .. seealso:: :py:mod:`supercell.api.provider.ProviderBase.provide`
         """
         # TODO error if no request body is set
-        return model(json.loads(handler.request.body))
+        return model(json.loads(handler.request.body.decode('utf8')))

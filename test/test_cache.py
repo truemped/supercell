@@ -16,6 +16,7 @@
 #
 #
 from datetime import datetime, timedelta
+import json
 
 from schematics.models import Model
 from schematics.types import StringType
@@ -147,5 +148,6 @@ class TestCacheDecorator(AsyncHTTPTestCase):
         self.assertTrue('Cache-Control' in response.headers)
         self.assertEqual('max-age=10, must-revalidate',
                          response.headers['Cache-Control'])
-        self.assertEqual('{"message": "A test", "doc_id": "test123"}',
-                         response.body)
+        self.assertEqual('{"doc_id": "test123", "message": "A test"}',
+                         json.dumps(json.loads(response.body.decode('utf8')),
+                                    sort_keys=True))

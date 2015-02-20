@@ -184,7 +184,7 @@ class ApplicationIntegrationTest(AsyncHTTPTestCase):
         response = self.fetch('/test', headers={'Accept':
                                                 s.MediaType.ApplicationJson})
         self.assertEqual(200, response.code)
-        self.assertEqual('{"msg": "Holy moly"}', response.body)
+        self.assertEqual('{"msg": "Holy moly"}', response.body.decode('utf8'))
 
     def test_get_with_exception(self):
         response = self.fetch('/exception')
