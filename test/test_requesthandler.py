@@ -144,8 +144,11 @@ class EncodingTestingHandler(s.RequestHandler):
 
     @s.async
     def get(self, *args, **kwargs):
+        json_args = json.dumps(args)
+        json_kwargs = json.dumps(kwargs)
         r = SimpleMessage({"doc_id": 'test123',
-                           "message": 'args=%s; kwargs=%s' % (args, kwargs)})
+                           "message": 'args=%s; kwargs=%s' % (json_args,
+                                                              json_kwargs)})
         raise s.Return(r)
 
 
@@ -163,8 +166,8 @@ class TestUrlEncoding(AsyncHTTPTestCase):
         response = self.fetch('/testencoding/alfredo-p%e9rez-rubalcaba')
         self.assertEqual(200, response.code)
         self.assertEqual('{"doc_id": "test123", "message": "' +
-                         'args=(u\'alfredo-p\\\\xe9rez-' +
-                         'rubalcaba\',); kwargs={}"}',
+                         'args=[\\"alfredo-p\\\\u00e9rez-rubalcaba\\"]; ' +
+                         'kwargs={}"}',
                          json.dumps(json.loads(response.body.decode('utf8')),
                                     sort_keys=True))
 
@@ -172,10 +175,10 @@ class TestUrlEncoding(AsyncHTTPTestCase):
         response = self.fetch('/testencoding/alfredo-p%C3%A9rez-rubalcaba')
         self.assertEqual(200, response.code)
         self.assertEqual('{"doc_id": "test123", "message": "' +
-                         'args=(u\'alfredo-p\\\\xe9rez-' +
-                         'rubalcaba\',); kwargs={}"}',
+                         'args=[\\"alfredo-p\\\\u00e9rez-rubalcaba\\"]; ' +
+                         'kwargs={}"}',
                          json.dumps(json.loads(response.body.decode('utf8')),
-                                    sort_keys=True).encode('utf8'))
+                                    sort_keys=True))
 
 
 class TestSimpleHtmlHandler(AsyncHTTPTestCase):
@@ -210,8 +213,7 @@ class TestSimpleHtmlHandler(AsyncHTTPTestCase):
         exp_html = ("<html>\n<head><title>Test</title></head>\n" +
                     "<body>\ndoc_id: test123\nmessage: bliblablup\n" +
                     "</body>\n</html>\n")
-        assert exp_html == response.body.decode('utf8')
-        self.assertEqual(exp_html, response.body)
+        self.assertEqual(exp_html, response.body.decode('utf8'))
 
 
 class TestSimpleHtmlHandlerWithMissingTemplate(AsyncHTTPTestCase):
