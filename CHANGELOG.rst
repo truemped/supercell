@@ -1,3 +1,12 @@
+0.7.0 - (August 24, 2015)
+-------------------------
+
+- Updated requires.io badge
+- Removed buildout
+- Tornado 4.2.1
+- Python 3.4 compatibility
+
+
 0.6.3 - (January 12, 2015)
 --------------------------
 
