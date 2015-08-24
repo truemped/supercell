@@ -101,7 +101,8 @@ class TestSimpleQueryParam(AsyncHTTPTestCase):
         response = self.fetch('/test?docid=noway&message=1')
 
         self.assertEqual(400, response.code)
-        self.assertEqual('{"docid": ["Value is not int"], "error": true}',
+        self.assertEqual('{"docid": ["Value \'noway\' is not int."], ' +
+                         '"error": true}',
                          json.dumps(json.loads(response.body.decode('utf8')),
                                     sort_keys=True))
 
