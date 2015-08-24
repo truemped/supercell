@@ -17,9 +17,8 @@ serializations of the domain models.
 .. |CoverAlls| image:: https://coveralls.io/repos/truemped/supercell/badge.png?branch=master
 .. _CoverAlls: https://coveralls.io/r/truemped/supercell
 
-.. image:: https://requires.io/github/truemped/supercell/requirements.svg?branch=master
-     :target: https://requires.io/github/truemped/supercell/requirements/?branch=master
-     :alt: Requirements Status
+.. |RequiresIo| image:: https://requires.io/github/truemped/supercell/requirements.svg?branch=master
+.. _RequiresIo: https://requires.io/github/truemped/supercell/requirements/?branch=master
 
 
 Quick Links
